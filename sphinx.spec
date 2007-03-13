@@ -3,6 +3,7 @@
 %define		_rc		rc2
 %define		_rel	0.1
 Summary:	Free open-source SQL full-text search engine
+Summary(pl.UTF-8):	Silnik przeszukiwania pełnotekstowego SQL open-source
 Name:		sphinx
 Version:	0.9.7
 Release:	0.%{_rc}.%{_rel}
@@ -25,6 +26,15 @@ applications. Sphinx was specially designed to integrate well with SQL
 databases and scripting languages. Currently built-in data sources
 support fetching data either via direct connection to MySQL, or from
 an XML pipe.
+
+%description -l pl.UTF-8
+Sphinx jest samodzielnym silnikiem przeszukującym, dostarczającym
+innym aplikacjom szybkie, zoptymalizowane rozmiarowo funkcje
+przeszukiwania pełnotekstowego. Sphinx został specjalnie
+zaprojektowany z myślą o dobrej integracji z bazami danych SQL oraz
+językami skryptowymi. Obecnie wbudowane źródła danych wspierają
+pobieranie danych poprzez bezpośrednie połączenie z MySQL lub
+z potoku XML.
 
 %prep
 %setup -q -n %{name}-%{version}-%{_rc}
