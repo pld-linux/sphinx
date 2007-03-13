@@ -1,0 +1,64 @@
+# TODO
+# - make mysql Storage Engine
+%define		_rc		rc2
+%define		_rel	0.1
+Summary:	Free open-source SQL full-text search engine
+Name:		sphinx
+Version:	0.9.7
+Release:	0.%{_rc}.%{_rel}
+License:	GPL v2
+Group:		Applications/Databases
+Source0:	http://www.sphinxsearch.com/downloads/%{name}-%{version}-%{_rc}.tar.gz
+# Source0-md5:	65daf0feb7e276fb3de0aba82cff1d3e
+Patch0:		%{name}-offset_t.patch
+Patch1:		%{name}-DESTDIR.patch
+URL:		http://www.sphinxsearch.com/
+BuildRequires:	autoconf
+BuildRequires:	automake
+BuildRequires:	mysql-devel
+BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
+
+%description
+Sphinx is a a standalone search engine, meant to provide fast,
+size-efficient and relevant fulltext search functions to other
+applications. Sphinx was specially designed to integrate well with SQL
+databases and scripting languages. Currently built-in data sources
+support fetching data either via direct connection to MySQL, or from
+an XML pipe.
+
+%prep
+%setup -q -n %{name}-%{version}-%{_rc}
+%ifnarch %{x8664} alpha
+# he uses off_t for 8 bit pointers. at least i686 has off_t 4 bit
+# it could break code but at least it compiles now.
+%patch0 -p1
+%endif
+%patch1 -p1
+
+%build
+%{__aclocal}
+%{__autoconf}
+%{__autoheader}
+%{__automake}
+%configure
+%{__make}
+
+%install
+rm -rf $RPM_BUILD_ROOT
+
+%{__make} install \
+	DESTDIR=$RPM_BUILD_ROOT
+
+rm -f $RPM_BUILD_ROOT%{_sysconfdir}/example.sql
+mv $RPM_BUILD_ROOT%{_sysconfdir}/sphinx.conf{.dist,}
+
+%clean
+rm -rf $RPM_BUILD_ROOT
+
+%files
+%defattr(644,root,root,755)
+%doc doc/sphinx.txt example.sql
+%config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/sphinx.conf
+%attr(755,root,root) %{_bindir}/indexer
+%attr(755,root,root) %{_bindir}/search
+%attr(755,root,root) %{_bindir}/searchd
