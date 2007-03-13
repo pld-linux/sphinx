@@ -1,0 +1,10 @@
+--- sphinx-0.9.7-rc2/Makefile.am~	2006-06-18 13:05:50.000000000 +0300
++++ sphinx-0.9.7-rc2/Makefile.am	2007-03-13 10:51:58.309541395 +0200
+@@ -3,6 +3,6 @@
+ sysconf_DATA = sphinx.conf.dist example.sql
+ 
+ install-data-hook:
+-	mkdir -p $(localstatedir)/data && mkdir -p $(localstatedir)/log
++	mkdir -p $(DESTDIR)$(localstatedir)/data && mkdir -p $(DESTDIR)$(localstatedir)/log
+ 
+ 
