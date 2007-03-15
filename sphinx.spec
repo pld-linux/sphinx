@@ -1,7 +1,5 @@
-# TODO
-# - make mysql Storage Engine
 %define		_rc		rc2
-%define		_rel	0.1
+%define		_rel	0.2
 Summary:	Free open-source SQL full-text search engine
 Summary(pl.UTF-8):	Silnik przeszukiwania pełnotekstowego SQL open-source
 Name:		sphinx
@@ -11,8 +9,7 @@ License:	GPL v2
 Group:		Applications/Databases
 Source0:	http://www.sphinxsearch.com/downloads/%{name}-%{version}-%{_rc}.tar.gz
 # Source0-md5:	65daf0feb7e276fb3de0aba82cff1d3e
-Patch0:		%{name}-offset_t.patch
-Patch1:		%{name}-DESTDIR.patch
+Patch0:		%{name}-DESTDIR.patch
 URL:		http://www.sphinxsearch.com/
 BuildRequires:	autoconf
 BuildRequires:	automake
@@ -38,18 +35,14 @@ z potoku XML.
 
 %prep
 %setup -q -n %{name}-%{version}-%{_rc}
-%ifnarch %{x8664} alpha
-# he uses off_t for 8 bit pointers. at least i686 has off_t 4 bit
-# it could break code but at least it compiles now.
 %patch0 -p1
-%endif
-%patch1 -p1
 
 %build
 %{__aclocal}
 %{__autoconf}
 %{__autoheader}
 %{__automake}
+CPPFLAGS=-D_FILE_OFFSET_BITS=64
 %configure
 %{__make}
 
