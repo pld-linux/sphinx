@@ -1,5 +1,7 @@
+#  TODO
+# - packages for PHP/Python API
 %define		_rc		rc2
-%define		_rel	0.2
+%define		_rel	0.3
 Summary:	Free open-source SQL full-text search engine
 Summary(pl.UTF-8):	Silnik przeszukiwania pełnotekstowego SQL open-source
 Name:		sphinx
@@ -43,7 +45,9 @@ z potoku XML.
 %{__autoheader}
 %{__automake}
 CPPFLAGS=-D_FILE_OFFSET_BITS=64
-%configure
+%configure \
+	--with-mysql \
+	--with-pgsql
 %{__make}
 
 %install
