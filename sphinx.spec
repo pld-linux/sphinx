@@ -1,7 +1,9 @@
 #  TODO
 # - packages for PHP/Python API
+%bcond_without	pgsql		# without pgsql support
+#
 %define		_rc		rc2
-%define		_rel	0.3
+%define		_rel		0.3
 Summary:	Free open-source SQL full-text search engine
 Summary(pl.UTF-8):	Silnik przeszukiwania pełnotekstowego SQL open-source
 Name:		sphinx
@@ -16,6 +18,13 @@ URL:		http://www.sphinxsearch.com/
 BuildRequires:	autoconf
 BuildRequires:	automake
 BuildRequires:	mysql-devel
+%if %{with_pgsql}
+BuildRequires:	postgresql-devel
+%endif
+Requires:	mysql-libs
+%if %{with_pgsql}
+Requires:	postgresql-libs
+%endif
 BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
 
 %description
@@ -46,8 +55,8 @@ z potoku XML.
 %{__automake}
 CPPFLAGS=-D_FILE_OFFSET_BITS=64
 %configure \
-	--with-mysql \
-	--with-pgsql
+	%{?with_pgsql:--with-pgsql} \
+	--with-mysql
 %{__make}
 
 %install
