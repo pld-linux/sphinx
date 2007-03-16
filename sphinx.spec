@@ -1,5 +1,7 @@
 #  TODO
 # - packages for PHP/Python API
+#
+# Conditional build:
 %bcond_without	pgsql		# without pgsql support
 #
 %define		_rc		rc2
