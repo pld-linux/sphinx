@@ -18,13 +18,8 @@ URL:		http://www.sphinxsearch.com/
 BuildRequires:	autoconf
 BuildRequires:	automake
 BuildRequires:	mysql-devel
-%if %{with_pgsql}
-BuildRequires:	postgresql-devel
-%endif
+%{?with_pgsql:BuildRequires:	postgresql-devel}
 Requires:	mysql-libs
-%if %{with_pgsql}
-Requires:	postgresql-libs
-%endif
 BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
 
 %description
@@ -41,8 +36,8 @@ innym aplikacjom szybkie, zoptymalizowane rozmiarowo funkcje
 przeszukiwania pełnotekstowego. Sphinx został specjalnie
 zaprojektowany z myślą o dobrej integracji z bazami danych SQL oraz
 językami skryptowymi. Obecnie wbudowane źródła danych wspierają
-pobieranie danych poprzez bezpośrednie połączenie z MySQL lub
-z potoku XML.
+pobieranie danych poprzez bezpośrednie połączenie z MySQL lub z potoku
+XML.
 
 %prep
 %setup -q -n %{name}-%{version}-%{_rc}
