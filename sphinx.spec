@@ -1,20 +1,18 @@
 #  TODO
-# - packages for PHP/Python API
+# - packages for PHP/Python/Ruby API
 #
 # Conditional build:
 %bcond_without	pgsql		# without pgsql support
 #
-%define		_rc		rc2
-%define		_rel		0.3
 Summary:	Free open-source SQL full-text search engine
 Summary(pl.UTF-8):	Silnik przeszukiwania pełnotekstowego SQL open-source
 Name:		sphinx
 Version:	0.9.7
-Release:	0.%{_rc}.%{_rel}
+Release:	0.2
 License:	GPL v2
 Group:		Applications/Databases
-Source0:	http://www.sphinxsearch.com/downloads/%{name}-%{version}-%{_rc}.tar.gz
-# Source0-md5:	65daf0feb7e276fb3de0aba82cff1d3e
+Source0:	http://www.sphinxsearch.com/downloads/sphinx-0.9.7.tar.gz
+# Source0-md5:	32f2b7e98d8485c86108851d52c5cef4
 Patch0:		%{name}-DESTDIR.patch
 URL:		http://www.sphinxsearch.com/
 BuildRequires:	autoconf
@@ -42,7 +40,7 @@ pobieranie danych poprzez bezpośrednie połączenie z MySQL lub z potoku
 XML.
 
 %prep
-%setup -q -n %{name}-%{version}-%{_rc}
+%setup -q -n %{name}-%{version}
 %patch0 -p1
 
 %build
