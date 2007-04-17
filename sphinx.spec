@@ -11,7 +11,7 @@ Version:	0.9.7
 Release:	0.2
 License:	GPL v2
 Group:		Applications/Databases
-Source0:	http://www.sphinxsearch.com/downloads/sphinx-0.9.7.tar.gz
+Source0:	http://www.sphinxsearch.com/downloads/%{name}-%{version}.tar.gz
 # Source0-md5:	32f2b7e98d8485c86108851d52c5cef4
 Patch0:		%{name}-DESTDIR.patch
 URL:		http://www.sphinxsearch.com/
@@ -40,7 +40,7 @@ pobieranie danych poprzez bezpośrednie połączenie z MySQL lub z potoku
 XML.
 
 %prep
-%setup -q -n %{name}-%{version}
+%setup -q
 %patch0 -p1
 
 %build
