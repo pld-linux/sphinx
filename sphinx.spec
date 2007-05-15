@@ -8,12 +8,13 @@ Summary:	Free open-source SQL full-text search engine
 Summary(pl.UTF-8):	Silnik przeszukiwania pełnotekstowego SQL open-source
 Name:		sphinx
 Version:	0.9.7
-Release:	0.2
+Release:	0.3
 License:	GPL v2
 Group:		Applications/Databases
 Source0:	http://www.sphinxsearch.com/downloads/%{name}-%{version}.tar.gz
 # Source0-md5:	32f2b7e98d8485c86108851d52c5cef4
 Patch0:		%{name}-DESTDIR.patch
+Source1:	sphinx.init
 URL:		http://www.sphinxsearch.com/
 BuildRequires:	autoconf
 BuildRequires:	automake
@@ -56,12 +57,16 @@ CPPFLAGS=-D_FILE_OFFSET_BITS=64
 
 %install
 rm -rf $RPM_BUILD_ROOT
+install -d $RPM_BUILD_ROOT%{_sbindir}
+install -d $RPM_BUILD_ROOT{%{_sbindir},/etc/rc.d/init.d}
 
 %{__make} install \
 	DESTDIR=$RPM_BUILD_ROOT
 
 rm -f $RPM_BUILD_ROOT%{_sysconfdir}/example.sql
 mv $RPM_BUILD_ROOT%{_sysconfdir}/sphinx.conf{.dist,}
+mv $RPM_BUILD_ROOT{%{_bindir},%{_sbindir}}/searchd
+install %{SOURCE1} $RPM_BUILD_ROOT/etc/rc.d/init.d/%{name}
 
 %clean
 rm -rf $RPM_BUILD_ROOT
@@ -72,4 +77,5 @@ rm -rf $RPM_BUILD_ROOT
 %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/sphinx.conf
 %attr(755,root,root) %{_bindir}/indexer
 %attr(755,root,root) %{_bindir}/search
-%attr(755,root,root) %{_bindir}/searchd
+%attr(755,root,root) %{_sbindir}/searchd
+%attr(754,root,root) /etc/rc.d/init.d/%{name}
