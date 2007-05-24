@@ -1,5 +1,5 @@
 #  TODO
-# - packages for PHP/Python/Ruby API
+# - packages for Python/Ruby API
 #
 # Conditional build:
 %bcond_without	pgsql		# without pgsql support
@@ -8,7 +8,7 @@ Summary:	Free open-source SQL full-text search engine
 Summary(pl.UTF-8):	Silnik przeszukiwania pełnotekstowego SQL open-source
 Name:		sphinx
 Version:	0.9.7
-Release:	0.3
+Release:	0.4
 License:	GPL v2
 Group:		Applications/Databases
 Source0:	http://www.sphinxsearch.com/downloads/%{name}-%{version}.tar.gz
@@ -40,6 +40,14 @@ językami skryptowymi. Obecnie wbudowane źródła danych wspierają
 pobieranie danych poprzez bezpośrednie połączenie z MySQL lub z potoku
 XML.
 
+%package -n php-sphinx
+Summary:	PHP API for Sphinx
+Group:		Libraries
+Requires:	php-common >= 4:5.0.4
+
+%description -n php-sphinx
+PHP API for Sphinx.
+
 %prep
 %setup -q
 %patch0 -p1
@@ -57,8 +65,7 @@ CPPFLAGS=-D_FILE_OFFSET_BITS=64
 
 %install
 rm -rf $RPM_BUILD_ROOT
-install -d $RPM_BUILD_ROOT%{_sbindir}
-install -d $RPM_BUILD_ROOT{%{_sbindir},/etc/rc.d/init.d}
+install -d $RPM_BUILD_ROOT{%{_sbindir},/etc/rc.d/init.d,%{_datadir}/php}
 
 %{__make} install \
 	DESTDIR=$RPM_BUILD_ROOT
@@ -67,6 +74,8 @@ rm -f $RPM_BUILD_ROOT%{_sysconfdir}/example.sql
 mv $RPM_BUILD_ROOT%{_sysconfdir}/sphinx.conf{.dist,}
 mv $RPM_BUILD_ROOT{%{_bindir},%{_sbindir}}/searchd
 install %{SOURCE1} $RPM_BUILD_ROOT/etc/rc.d/init.d/%{name}
+
+cp -a api/sphinxapi.php $RPM_BUILD_ROOT%{_datadir}/php
 
 %clean
 rm -rf $RPM_BUILD_ROOT
@@ -79,3 +88,6 @@ rm -rf $RPM_BUILD_ROOT
 %attr(755,root,root) %{_bindir}/search
 %attr(755,root,root) %{_sbindir}/searchd
 %attr(754,root,root) /etc/rc.d/init.d/%{name}
+
+%files -n php-sphinx
+%{_datadir}/php/sphinxapi.php
