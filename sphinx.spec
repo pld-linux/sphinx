@@ -42,11 +42,15 @@ XML.
 
 %package -n php-sphinx
 Summary:	PHP API for Sphinx
+Summary(pl.UTF-8):	API PHP dla Sphinksa
 Group:		Libraries
 Requires:	php-common >= 4:5.0.4
 
 %description -n php-sphinx
 PHP API for Sphinx.
+
+%description -n php-sphinx -l pl.UTF-8
+API PHP dla Sphinksa.
 
 %prep
 %setup -q
@@ -90,4 +94,5 @@ rm -rf $RPM_BUILD_ROOT
 %attr(754,root,root) /etc/rc.d/init.d/%{name}
 
 %files -n php-sphinx
+%defattr(644,root,root,755)
 %{_datadir}/php/sphinxapi.php
