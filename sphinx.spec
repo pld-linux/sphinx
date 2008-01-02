@@ -4,23 +4,28 @@
 # Conditional build:
 %bcond_without	pgsql		# without pgsql support
 #
+%define		subver	-svn-r985
+%include	/usr/lib/rpm/macros.java
 Summary:	Free open-source SQL full-text search engine
 Summary(pl.UTF-8):	Silnik przeszukiwania pełnotekstowego SQL open-source
 Name:		sphinx
-Version:	0.9.7
-Release:	0.4
+Version:	0.9.8
+Release:	0.1
 License:	GPL v2
 Group:		Applications/Databases
-Source0:	http://www.sphinxsearch.com/downloads/%{name}-%{version}.tar.gz
-# Source0-md5:	32f2b7e98d8485c86108851d52c5cef4
+Source0:	http://www.sphinxsearch.com/downloads/%{name}-%{version}%{subver}.tar.gz
+# Source0-md5:	099f1e7fbd21003c4446a3ef49c0600a
 Patch0:		%{name}-DESTDIR.patch
-Source1:	sphinx.init
+Source1:	%{name}.init
 URL:		http://www.sphinxsearch.com/
 BuildRequires:	autoconf
 BuildRequires:	automake
 BuildRequires:	mysql-devel
+BuildRequires:	libstdc++-devel
 %{?with_pgsql:BuildRequires:	postgresql-devel}
-Requires:	mysql-libs
+BuildRequires:	jpackage-utils
+BuildRequires:	rpm-javaprov
+BuildRequires:	rpmbuild(macros) >= 1.300
 BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
 
 %description
@@ -40,6 +45,14 @@ językami skryptowymi. Obecnie wbudowane źródła danych wspierają
 pobieranie danych poprzez bezpośrednie połączenie z MySQL lub z potoku
 XML.
 
+%package -n java-sphinx
+Summary:	Java API for Sphinx
+Group:		Development/Languages/Java
+Requires:	jpackage-utils
+
+%description -n java-sphinx
+Java API for Sphinx.
+
 %package -n php-sphinx
 Summary:	PHP API for Sphinx
 Summary(pl.UTF-8):	API PHP dla Sphinksa
@@ -53,7 +66,7 @@ PHP API for Sphinx.
 API PHP dla Sphinksa.
 
 %prep
-%setup -q
+%setup -q -n %{name}-%{version}%{subver}
 %patch0 -p1
 
 %build
@@ -67,9 +80,12 @@ CPPFLAGS=-D_FILE_OFFSET_BITS=64
 	--with-mysql
 %{__make}
 
+export JAVA_HOME="%{java_home}"
+%{__make} -j1 -C api/java
+
 %install
 rm -rf $RPM_BUILD_ROOT
-install -d $RPM_BUILD_ROOT{%{_sbindir},/etc/rc.d/init.d,%{_datadir}/php}
+install -d $RPM_BUILD_ROOT{%{_sbindir},/etc/rc.d/init.d}
 
 %{__make} install \
 	DESTDIR=$RPM_BUILD_ROOT
@@ -79,7 +95,13 @@ mv $RPM_BUILD_ROOT%{_sysconfdir}/sphinx.conf{.dist,}
 mv $RPM_BUILD_ROOT{%{_bindir},%{_sbindir}}/searchd
 install %{SOURCE1} $RPM_BUILD_ROOT/etc/rc.d/init.d/%{name}
 
+install -d $RPM_BUILD_ROOT%{_datadir}/php
 cp -a api/sphinxapi.php $RPM_BUILD_ROOT%{_datadir}/php
+
+# jars
+install -d $RPM_BUILD_ROOT%{_javadir}
+cp -a api/java/sphinxapi.jar $RPM_BUILD_ROOT%{_javadir}/%{name}-%{version}.jar
+ln -s %{name}-%{version}.jar $RPM_BUILD_ROOT%{_javadir}/%{name}.jar
 
 %clean
 rm -rf $RPM_BUILD_ROOT
@@ -92,6 +114,11 @@ rm -rf $RPM_BUILD_ROOT
 %attr(755,root,root) %{_bindir}/search
 %attr(755,root,root) %{_sbindir}/searchd
 %attr(754,root,root) /etc/rc.d/init.d/%{name}
+
+%files -n java-sphinx
+%defattr(644,root,root,755)
+%doc api/java/README
+%{_javadir}/*.jar
 
 %files -n php-sphinx
 %defattr(644,root,root,755)
