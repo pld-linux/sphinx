@@ -15,15 +15,15 @@ License:	GPL v2
 Group:		Applications/Databases
 Source0:	http://www.sphinxsearch.com/downloads/%{name}-%{version}%{subver}.tar.gz
 # Source0-md5:	099f1e7fbd21003c4446a3ef49c0600a
-Patch0:		%{name}-DESTDIR.patch
 Source1:	%{name}.init
+Patch0:		%{name}-DESTDIR.patch
 URL:		http://www.sphinxsearch.com/
 BuildRequires:	autoconf
 BuildRequires:	automake
-BuildRequires:	mysql-devel
-BuildRequires:	libstdc++-devel
-%{?with_pgsql:BuildRequires:	postgresql-devel}
 BuildRequires:	jpackage-utils
+BuildRequires:	libstdc++-devel
+BuildRequires:	mysql-devel
+%{?with_pgsql:BuildRequires:	postgresql-devel}
 BuildRequires:	rpm-javaprov
 BuildRequires:	rpmbuild(macros) >= 1.300
 BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
@@ -47,11 +47,15 @@ XML.
 
 %package -n java-sphinx
 Summary:	Java API for Sphinx
+Summary(pl.UTF-8):	API Javy dla Sphinksa
 Group:		Development/Languages/Java
 Requires:	jpackage-utils
 
 %description -n java-sphinx
 Java API for Sphinx.
+
+%description -n java-sphinx -l pl.UTF-8
+API Javy dla Sphinksa.
 
 %package -n php-sphinx
 Summary:	PHP API for Sphinx
@@ -118,7 +122,7 @@ rm -rf $RPM_BUILD_ROOT
 %files -n java-sphinx
 %defattr(644,root,root,755)
 %doc api/java/README
-%{_javadir}/*.jar
+%{_javadir}/sphinx*.jar
 
 %files -n php-sphinx
 %defattr(644,root,root,755)
