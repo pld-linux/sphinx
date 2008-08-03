@@ -1,28 +1,33 @@
-#  TODO
-# - packages for Python/Ruby API
+#
+# TODO:
+#  - package for ruby API
 #
 # Conditional build:
+%bcond_without	java		# without java support
+%bcond_without	libstemmer	# without libstemmer support
+%bcond_without	mysql		# without mysql support
 %bcond_without	pgsql		# without pgsql support
 #
-%define		subver	-svn-r985
 %include	/usr/lib/rpm/macros.java
 Summary:	Free open-source SQL full-text search engine
 Summary(pl.UTF-8):	Silnik przeszukiwania pełnotekstowego SQL open-source
 Name:		sphinx
 Version:	0.9.8
-Release:	0.1
+Release:	1
 License:	GPL v2
 Group:		Applications/Databases
-Source0:	http://www.sphinxsearch.com/downloads/%{name}-%{version}%{subver}.tar.gz
-# Source0-md5:	099f1e7fbd21003c4446a3ef49c0600a
+Source0:	http://www.sphinxsearch.com/downloads/%{name}-%{version}.tar.gz
+# Source0-md5:	347e547b79b733778d7553ede34e0aac
 Source1:	%{name}.init
-Patch0:		%{name}-DESTDIR.patch
+Patch0:		%{name}-system-libstemmer.patch
 URL:		http://www.sphinxsearch.com/
 BuildRequires:	autoconf
 BuildRequires:	automake
-BuildRequires:	jpackage-utils
+BuildRequires:	expat-devel
+%{?with_java:BuildRequires:	java-sun}
 BuildRequires:	libstdc++-devel
-BuildRequires:	mysql-devel
+%{?with_libstemmer:BuildRequires:	libstemmer-devel}
+%{?with_mysql:BuildRequires:	mysql-devel}
 %{?with_pgsql:BuildRequires:	postgresql-devel}
 BuildRequires:	rpm-javaprov
 BuildRequires:	rpmbuild(macros) >= 1.300
@@ -44,6 +49,41 @@ zaprojektowany z myślą o dobrej integracji z bazami danych SQL oraz
 językami skryptowymi. Obecnie wbudowane źródła danych wspierają
 pobieranie danych poprzez bezpośrednie połączenie z MySQL lub z potoku
 XML.
+
+%package -n libsphinxclient
+Summary:	Client library for Sphinx
+Summary(pl.UTF-8):	Biblioteka kliencka do Sphinx
+Group:		Libraries
+
+%description -n libsphinxclient
+This package provides a client library for Sphinx search engine.
+
+%description -n libsphinxclient -l PL.UTF_8
+Pakiet ten dostarcza biblioteki klienckiej do silnika Sphinx.
+
+%package -n libsphinxclient-devel
+Summary:	Header files for sphinxclient library
+Summary(pl.UTF-8):	Pliki nagłówkowe biblioteki sphinxclient
+Group:		Development/Libraries
+Requires:	libsphinxclient = %{version}-%{release}
+
+%description -n libsphinxclient-devel
+Header files for sphinxclient library.
+
+%description -n libsphinxclient-devel -l pl.UTF-8
+Pliki nagłówkowe biblioteki sphinxclient.
+
+%package -n libsphinxclient-static
+Summary:	Static sphinxclient library
+Summary(pl.UTF-8):	Statyczna biblioteka sphinxclient
+Group:		Development/Libraries
+Requires:	libsphinxclient-devel = %{version}-%{release}
+
+%description -n libsphinxclient-static
+Static sphinxclient library.
+
+%description -n libsphinxclient-static -l pl.UTF-8
+Statyczna biblioteka sphinxclient.
 
 %package -n java-sphinx
 Summary:	Java API for Sphinx
@@ -69,8 +109,20 @@ PHP API for Sphinx.
 %description -n php-sphinx -l pl.UTF-8
 API PHP dla Sphinksa.
 
+%package -n python-sphinx
+Summary:	Python API for Sphinx
+Summary(pl.UTF-8):	API Python dla Sphinksa
+Group:		Development/Languages/Python
+%pyrequires_eq	python
+
+%description -n python-sphinx
+Python API for Sphinx.
+
+%description -n python-sphinx -l pl.UTF-8
+API Pythona dla Sphinksa.
+
 %prep
-%setup -q -n %{name}-%{version}%{subver}
+%setup -q
 %patch0 -p1
 
 %build
@@ -80,12 +132,28 @@ API PHP dla Sphinksa.
 %{__automake}
 CPPFLAGS=-D_FILE_OFFSET_BITS=64
 %configure \
-	%{?with_pgsql:--with-pgsql} \
-	--with-mysql
+	--with%{!?with_libstemmer:out}-libstemmer \
+	--with%{!?with_pgsql:out}-pgsql \
+	--with%{!?with_mysql:out}-mysql
 %{__make}
 
+# libsphinxclient
+cd api/libsphinxclient
+%{__libtoolize}
+%{__aclocal}
+%{__autoconf}
+%{__autoheader}
+%{__automake}
+CPPFLAGS=-D_FILE_OFFSET_BITS=64
+%configure
+%{__make}
+cd ../..
+
+# java api
+%if %{with java}
 export JAVA_HOME="%{java_home}"
 %{__make} -j1 -C api/java
+%endif
 
 %install
 rm -rf $RPM_BUILD_ROOT
@@ -102,28 +170,70 @@ install %{SOURCE1} $RPM_BUILD_ROOT/etc/rc.d/init.d/%{name}
 install -d $RPM_BUILD_ROOT%{_datadir}/php
 cp -a api/sphinxapi.php $RPM_BUILD_ROOT%{_datadir}/php
 
-# jars
+# libsphinxclient
+%{__make} -C api/libsphinxclient install \
+	DESTDIR=$RPM_BUILD_ROOT
+
+# python api
+install -d $RPM_BUILD_ROOT%{py_sitescriptdir}
+install api/sphinxapi.py $RPM_BUILD_ROOT%{py_sitescriptdir}
+%py_comp $RPM_BUILD_ROOT%{py_sitescriptdir}
+%py_ocomp $RPM_BUILD_ROOT%{py_sitescriptdir}
+%py_postclean
+
+# ruby api
+
+# java api
+%if %{with java}
 install -d $RPM_BUILD_ROOT%{_javadir}
 cp -a api/java/sphinxapi.jar $RPM_BUILD_ROOT%{_javadir}/%{name}-%{version}.jar
 ln -s %{name}-%{version}.jar $RPM_BUILD_ROOT%{_javadir}/%{name}.jar
+%endif
 
 %clean
 rm -rf $RPM_BUILD_ROOT
+
+%post	-n libsphinxclient 	-p /sbin/ldconfig
+%postun	-n libsphinxclient	-p /sbin/ldconfig
 
 %files
 %defattr(644,root,root,755)
 %doc doc/sphinx.txt example.sql
 %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/sphinx.conf
+%config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/sphinx-min.conf.dist
 %attr(755,root,root) %{_bindir}/indexer
 %attr(755,root,root) %{_bindir}/search
+%attr(755,root,root) %{_bindir}/spelldump
 %attr(755,root,root) %{_sbindir}/searchd
 %attr(754,root,root) /etc/rc.d/init.d/%{name}
 
+%files -n libsphinxclient
+%defattr(644,root,root,755)
+%doc api/libsphinxclient/README
+%attr(755,root,root) %{_libdir}/libsphinxclient-*.*.*.so
+
+%files -n libsphinxclient-devel
+%defattr(644,root,root,755)
+%attr(755,root,root) %{_libdir}/libsphinxclient.so
+%{_libdir}/*.la
+%{_includedir}/*.h
+
+%files -n libsphinxclient-static
+%defattr(644,root,root,755)
+%{_libdir}/lib*.a
+%{_libdir}/lib*.la
+
+%if %{with java}
 %files -n java-sphinx
 %defattr(644,root,root,755)
 %doc api/java/README
 %{_javadir}/sphinx*.jar
+%endif
 
 %files -n php-sphinx
 %defattr(644,root,root,755)
 %{_datadir}/php/sphinxapi.php
+
+%files -n python-sphinx
+%defattr(644,root,root,755)
+%{py_sitescriptdir}/*.py?
