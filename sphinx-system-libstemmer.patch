@@ -1,91 +1,84 @@
 diff -burN sphinx-0.9.8.orig/acinclude.m4 sphinx-0.9.8/acinclude.m4
 --- sphinx-0.9.8.orig/acinclude.m4	2008-08-03 02:22:01.000000000 +0200
-+++ sphinx-0.9.8/acinclude.m4	2008-08-03 12:23:47.000000000 +0200
-@@ -254,6 +254,90 @@
++++ sphinx-0.9.8/acinclude.m4	2008-08-05 03:57:54.000000000 +0200
+@@ -254,6 +254,83 @@
  ])
  
  dnl ---------------------------------------------------------------------------
 +dnl Macro: AC_CHECK_LIBSTEMMER
-+dnl First check for custom libstemmer paths in --with-libstemmer-* options.
-+dnl If some paths are missing, try to guess them
++dnl Author: Adam Golebiowski <adamg@pld-linux.org>
++dnl First check for custom libstemmer include path in --with-libstemmer=* option
++dnl If not given, try to guess.
 +dnl ---------------------------------------------------------------------------
 +
 +AC_DEFUN([AC_CHECK_LIBSTEMMER],[
 +
-+# internal libstemmer_c ?
-+internal=0
++# cflags and libs
++LIBSTEMMER_CFLAGS=
++LIBSTEMMER_LIBS=
 +
-+# Check for custom includes path
-+if test [ -z "$ac_cv_libstemmer_includes" ] 
-+then 
-+	AC_ARG_WITH([libstemmer-includes], 
-+		AC_HELP_STRING([--with-libstemmer-includes], [path to libstemmer header files]),
-+		[ac_cv_libstemmer_includes=$withval])
-+fi
-+if test [ -n "$ac_cv_libstemmer_includes" ]
-+then
-+	AC_CACHE_CHECK([libstemmer includes], [ac_cv_libstemmer_includes], [ac_cv_libstemmer_includes=""])
-+	LIBSTEMMER_CFLAGS="-I$ac_cv_libstemmer_includes"
-+fi
++# possible includedir paths
++includedirs="/usr/include /usr/include/libstemmer /usr/include/libstemmer_c"
 +
-+# Check for custom library path
-+if test [ -z "$ac_cv_libstemmer_libs" ]
-+then
-+	AC_ARG_WITH([libstemmer-libs], 
-+		AC_HELP_STRING([--with-libstemmer-libs], [path to libstemmer library]),
-+		[ac_cv_libstemmer_libs=$withval])
-+fi
-+if test [ -n "$ac_cv_libstemmer_libs" ]
-+then
-+	AC_CACHE_CHECK([libstemmer libraries], [ac_cv_libstemmer_libs], [ac_cv_libstemmer_libs=""])
-+	LIBSTEMMER_LIBS="-L$ac_cv_libstemmer_libs"
++# possible libdirs -- 64bit first in case of multiarch environments
++libdirs="/usr/lib64 /usr/local/lib64 /usr/lib /usr/local/lib"
++
++# possible libnames -- shared one first, then static one
++libnames="stemmer stemmer_c"
++
++# was (include) path explicitely given?
++if test [ -n "$ac_cv_use_libstemmer" -a x$ac_cv_use_libstemmer != xyes]; then
++	includedirs=$ac_cv_use_libstemmer
 +fi
 +
-+# If some path is missing, try to autodetermine
-+if test [ -z "$ac_cv_libstemmer_includes" -o -z "$ac_cv_libstemmer_libs" ]
-+then
-+        if test [ -z "$ac_cv_libstemmer_includes" ]
-+        then
-+            AC_MSG_CHECKING(libstemmer C flags)
-+	    includedir=
-+            for dir in /usr/include /usr/include/libstemmer
-+	    do
-+		if test -f $dir/libstemmer.h; then
-+			includedir="-I$dir"
-+			break;
++# try to find header files
++for includedir in $includedirs
++do
++	if test [ -f $includedir/libstemmer.h ]; then
++		LIBSTEMMER_CFLAGS="-I$includedir"
++		break
++	fi
++done
++
++# try to find shared library
++for libname in $libnames
++do
++	for libdir in $libdirs
++	do
++		if test [ -f $libdir/lib${libname}.so ]; then
++			LIBSTEMMER_LIBS="-L$libdir -l$libname"
++			break 2
 +		fi
-+	    done
-+            if test x$includedir != x; then
-+		LIBSTEMMER_CFLAGS="-I$dir"
-+		AC_MSG_RESULT($LIBSTEMMER_CFLAGS)
-+	    else
-+		AC_MSG_ERROR([not found])
-+	    fi
-+        fi
-+        if test [ -z "$ac_cv_libstemmer_libs" ]
-+        then
-+            AC_MSG_CHECKING(libstemmer linker flags)
-+		libstemmerlibs=
-+		for dir in /usr/lib /usr/lib64
-+	        do
-+			if test -f $dir/libstemmer.so; then
-+				libstemmerlibs="-L$dir -lstemmer"
-+				break;
-+			fi
-+			if test -f $dir/libstemmer.a; then
-+				libstemmerlibs="$dir/libstemmer.a"
-+				break;
++	done
++done
++
++# if not found, check static libs
++if test [ -z "$LIBSTEMMER_LIBS" ]; then
++	for libname in $libnames
++	do
++		for libdir in $libdirs
++		do
++			if test [ -f $libdir/lib${libname}.a ]; then
++				LIBSTEMMER_LIBS="$libdir/lib${libname}.a"
++				break 2
 +			fi
 +		done
-+		if test [ -n "$libstemmerlibs" ]
-+		then
-+			LIBSTEMMER_LIBS="$libstemmerlibs"
-+			AC_MSG_RESULT($LIBSTEMMER_LIBS)
-+		else
-+			AC_MSG_ERROR([not found])
-+		fi
-+        fi
++	done
 +fi
++
++# if LIBSTEMMER_LIBS is not set at this moment,
++# our last chanceis to check for existance of internal copy of libstemmer_c
++# in case it doesn't exist -- we lost
++if test [ -z "$LIBSTEMMER_LIBS" ]; then
++	if test [ -d ./libstemmer_c ]; then
++		ac_cv_use_internal_libstemmer=1
++		LIBSTEMMER_LIBS="\$(top_srcdir)/libstemmer_c/libstemmer.a"
++		LIBSTEMMER_CFLAGS="-I\$(top_srcdir)/libstemmer_c/include"
++	else
++		AC_MSG_ERROR([not found])
++	fi
++fi
++
 +])
 +
 +dnl ---------------------------------------------------------------------------
@@ -94,7 +87,7 @@ diff -burN sphinx-0.9.8.orig/acinclude.m4 sphinx-0.9.8/acinclude.m4
  dnl Tells what stage is ./configure running now, nicely formatted
 diff -burN sphinx-0.9.8.orig/configure.ac sphinx-0.9.8/configure.ac
 --- sphinx-0.9.8.orig/configure.ac	2008-08-03 02:22:01.000000000 +0200
-+++ sphinx-0.9.8/configure.ac	2008-08-03 12:42:07.000000000 +0200
++++ sphinx-0.9.8/configure.ac	2008-08-05 03:26:57.000000000 +0200
 @@ -142,9 +142,6 @@
  AM_CONDITIONAL(USE_PGSQL, test x$ac_cv_use_pgsql != xno)
  
@@ -105,53 +98,38 @@ diff -burN sphinx-0.9.8.orig/configure.ac sphinx-0.9.8/configure.ac
  dnl ---
  
  AC_MSG_CHECKING([whether to use 64-bit document/word IDs])
-@@ -169,9 +166,31 @@
+@@ -169,22 +166,23 @@
  
  AC_MSG_CHECKING([whether to compile with libstemmer support])
  if test x$ac_cv_use_libstemmer != xno; then
-+		AC_MSG_RESULT([yes])
-+	AC_CHECK_LIBSTEMMER([$ac_cv_use_listemmer])
-+	AC_DEFINE(USE_LIBSTEMMER, 1, [Define to 1 if you want to compile with libstemmer support])
-+	AC_SUBST([LIBSTEMMER_LIBS])
-+	AC_SUBST([LIBSTEMMER_CFLAGS])
-+else
-+	AC_MSG_RESULT([no])
-+fi
-+AM_CONDITIONAL(USE_LIBSTEMMER, test x$ac_cv_use_libstemmer != xno)
-+
-+dnl ---
-+AC_ARG_WITH([internal-libstemmer],
-+	    AC_HELP_STRING([--with-internal-libstemmer], [compile with internali libstemmer]),
-+	    [ac_cv_use_internal_libstemmer=$withval], [ac_cv_use_internal_libstemmer=no]
-+)
-+
-+AC_MSG_CHECKING([whether to compile with internal libstemmer])
-+if test x$ac_cv_use_internal_libstemmer != xno; then
- 	if test -d libstemmer_c && test -f libstemmer_c/include/libstemmer.h; then
+-	if test -d libstemmer_c && test -f libstemmer_c/include/libstemmer.h; then
++	ac_cv_use_internal_libstemmer=0
  		AC_MSG_RESULT([yes])
 -		AC_DEFINE(USE_LIBSTEMMER, 1, [libstemmer support])
-+		INTERNAL_LIBSTEMMER_LIBS="\$(top_srcdir)/libstemmer_c/libstemmer.a"
-+		INTERNAL_LIBSTEMMER_CFLAGS="-I\$(top_srcdir)/libstemmer_c/include"
-+		AC_SUBST([INTERNAL_LIBSTEMMER_LIBS])
-+		AC_SUBST([INTERNAL_LIBSTEMMER_CFLAGS])
-+		AC_DEFINE(USE_INTERNAL_LIBSTEMMER, 1, [internal libstemmer support])
- 	else
- 		AC_MSG_ERROR([missing libstemmer sources from libstemmer_c.
- 
-@@ -181,10 +200,13 @@
- ])
- 	fi
+-	else
+-		AC_MSG_ERROR([missing libstemmer sources from libstemmer_c.
+-
+-Please download the C version of libstemmer library from
+-http://snowball.tartarus.org/ and extract its sources over libstemmer_c/
+-subdirectory in order to build Sphinx with libstemmer support.
+-])
+-	fi
++	AC_CHECK_LIBSTEMMER([$ac_cv_use_listemmer])
++	AC_DEFINE(USE_LIBSTEMMER, 1, [Define to 1 if you want to compile with libstemmer support])
++	AC_DEFINE(USE_INTERNAL_LIBSTEMMER, $ac_cv_use_internal_libstemmer, [Define to 1 if you want to compile with internal libstemmer library])
++	AC_SUBST([LIBSTEMMER_LIBS])
++	AC_SUBST([LIBSTEMMER_CFLAGS])
  else
--	AC_MSG_RESULT([no])
+ 	AC_MSG_RESULT([no])
 -	AC_DEFINE(USE_LIBSTEMMER, 0, [libstemmer support])
-+	AC_DEFINE(USE_INTERNAL_LIBSTEMMER, 0, [internal libstemmer support])
  fi
--AM_CONDITIONAL(USE_LIBSTEMMER, test x$ac_cv_use_libstemmer != xno)
-+AM_CONDITIONAL(USE_INTERNAL_LIBSTEMMER, test x$ac_cv_use_internal_libstemmer != xno)
+ AM_CONDITIONAL(USE_LIBSTEMMER, test x$ac_cv_use_libstemmer != xno)
++AM_CONDITIONAL(USE_INTERNAL_LIBSTEMMER, test x$ac_cv_use_internal_libstemmer != x0)
 +
++dnl ---
 +
 +# we can now set preprocessor flags for both C and C++ compilers
-+CPPFLAGS="$CPPFLAGS $MYSQL_CFLAGS $PGSQL_CFLAGS $LIBSTEMMER_CFLAGS $INTERNAL_LIBSTEMMER_CFLAGS"
++CPPFLAGS="$CPPFLAGS $MYSQL_CFLAGS $PGSQL_CFLAGS $LIBSTEMMER_CFLAGS"
  
  dnl ---
  
