@@ -3,10 +3,10 @@
 #  - package for ruby API
 #
 # Conditional build:
-%bcond_without	java		# without java support
+%bcond_without	java		# without Java support
 %bcond_without	libstemmer	# without libstemmer support
-%bcond_without	mysql		# without mysql support
-%bcond_without	pgsql		# without pgsql support
+%bcond_without	mysql		# without MySQL support
+%bcond_without	pgsql		# without PostgreSQL support
 #
 %include	/usr/lib/rpm/macros.java
 Summary:	Free open-source SQL full-text search engine
@@ -59,7 +59,7 @@ Group:		Libraries
 This package provides a client library for Sphinx search engine.
 
 %description -n libsphinxclient -l PL.UTF_8
-Pakiet ten dostarcza biblioteki klienckiej do silnika Sphinx.
+Ten pakiet dostarcza bibliotekę kliencką do silnika Sphinx.
 
 %package -n libsphinxclient-devel
 Summary:	Header files for sphinxclient library
@@ -193,8 +193,8 @@ ln -s %{name}-%{version}.jar $RPM_BUILD_ROOT%{_javadir}/%{name}.jar
 %clean
 rm -rf $RPM_BUILD_ROOT
 
-%post	-n libsphinxclient 	-p /sbin/ldconfig
-%postun	-n libsphinxclient	-p /sbin/ldconfig
+%post	-n libsphinxclient -p /sbin/ldconfig
+%postun	-n libsphinxclient -p /sbin/ldconfig
 
 %files
 %defattr(644,root,root,755)
@@ -215,13 +215,12 @@ rm -rf $RPM_BUILD_ROOT
 %files -n libsphinxclient-devel
 %defattr(644,root,root,755)
 %attr(755,root,root) %{_libdir}/libsphinxclient.so
-%{_libdir}/*.la
+%{_libdir}/libsphinxclient.la
 %{_includedir}/*.h
 
 %files -n libsphinxclient-static
 %defattr(644,root,root,755)
-%{_libdir}/lib*.a
-%{_libdir}/lib*.la
+%{_libdir}/libsphinxclient.a
 
 %if %{with java}
 %files -n java-sphinx
