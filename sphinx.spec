@@ -30,7 +30,7 @@ BuildRequires:	libstdc++-devel
 %{?with_mysql:BuildRequires:	mysql-devel}
 %{?with_pgsql:BuildRequires:	postgresql-devel}
 BuildRequires:	rpm-javaprov
-BuildRequires:	rpmbuild(macros) >= 1.300
+BuildRequires:	rpmbuild(macros) >= 1.461
 BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
 
 %description
@@ -167,8 +167,8 @@ mv $RPM_BUILD_ROOT%{_sysconfdir}/sphinx.conf{.dist,}
 mv $RPM_BUILD_ROOT{%{_bindir},%{_sbindir}}/searchd
 install %{SOURCE1} $RPM_BUILD_ROOT/etc/rc.d/init.d/%{name}
 
-install -d $RPM_BUILD_ROOT%{_datadir}/php
-cp -a api/sphinxapi.php $RPM_BUILD_ROOT%{_datadir}/php
+install -d $RPM_BUILD_ROOT%{php_data_dir}
+cp -a api/sphinxapi.php $RPM_BUILD_ROOT%{php_data_dir}
 
 # libsphinxclient
 %{__make} -C api/libsphinxclient install \
@@ -231,7 +231,7 @@ rm -rf $RPM_BUILD_ROOT
 
 %files -n php-sphinx
 %defattr(644,root,root,755)
-%{_datadir}/php/sphinxapi.php
+%{php_data_dir}/sphinxapi.php
 
 %files -n python-sphinx
 %defattr(644,root,root,755)
