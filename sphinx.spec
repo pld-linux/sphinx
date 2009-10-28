@@ -135,7 +135,7 @@ CPPFLAGS=-D_FILE_OFFSET_BITS=64
 	--with%{!?with_libstemmer:out}-libstemmer \
 	--with%{!?with_pgsql:out}-pgsql \
 	--with%{!?with_mysql:out}-mysql
-%{__make}
+%{__make} -j1
 
 # libsphinxclient
 cd api/libsphinxclient
@@ -146,7 +146,7 @@ cd api/libsphinxclient
 %{__automake}
 CPPFLAGS=-D_FILE_OFFSET_BITS=64
 %configure
-%{__make}
+%{__make} -j1
 cd ../..
 
 # java api
@@ -159,7 +159,7 @@ export JAVA_HOME="%{java_home}"
 rm -rf $RPM_BUILD_ROOT
 install -d $RPM_BUILD_ROOT{%{_sbindir},/etc/rc.d/init.d}
 
-%{__make} install \
+%{__make} -j1 install \
 	DESTDIR=$RPM_BUILD_ROOT
 
 rm -f $RPM_BUILD_ROOT%{_sysconfdir}/example.sql
