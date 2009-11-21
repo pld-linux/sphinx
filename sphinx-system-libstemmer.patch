@@ -27,7 +27,7 @@ diff -burN sphinx-0.9.8.orig/acinclude.m4 sphinx-0.9.8/acinclude.m4
 +libnames="stemmer stemmer_c"
 +
 +# was (include) path explicitely given?
-+if test [ -n "$ac_cv_use_libstemmer" -a x$ac_cv_use_libstemmer != xyes]; then
++if test [ -n "$ac_cv_use_libstemmer" -a x$ac_cv_use_libstemmer != xyes ]; then
 +	includedirs=$ac_cv_use_libstemmer
 +fi
 +
@@ -67,7 +67,7 @@ diff -burN sphinx-0.9.8.orig/acinclude.m4 sphinx-0.9.8/acinclude.m4
 +fi
 +
 +# if LIBSTEMMER_LIBS is not set at this moment,
-+# our last chanceis to check for existance of internal copy of libstemmer_c
++# our last chance is to check for existance of internal copy of libstemmer_c
 +# in case it doesn't exist -- we lost
 +if test [ -z "$LIBSTEMMER_LIBS" ]; then
 +	if test [ -d ./libstemmer_c ]; then
