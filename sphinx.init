@@ -7,6 +7,8 @@
 # description: Starts and stops the sphinx searchd daemon that handles \
 #	       all search requests.
 #
+# processname:	searchd
+#
 # $Id$
 
 # Source function library
@@ -21,7 +23,7 @@
 # Check that networking is up.
 if is_yes "${NETWORKING}"; then
 	if [ ! -f /var/lock/subsys/network -a "$1" != stop -a "$1" != status ]; then
-		msg_network_down sphinx
+		msg_network_down "sphinx searchd"
 		exit 1
 	fi
 else
@@ -30,36 +32,38 @@ fi
 
 start() {
 	# Check if the service is already running?
-	if [ ! -f /var/lock/subsys/sphinx ]; then
-		msg_starting sphinx
-		daemon sphinx
-		RETVAL=$?
-		[ $RETVAL -eq 0 ] && touch /var/lock/subsys/sphinx
-	else
-		msg_already_running sphinx
+	if [ -f /var/lock/subsys/sphinx ]; then
+		msg_already_running "sphinx searchd"
+		return
 	fi
+
+	msg_starting "sphinx searchd"
+	daemon /usr/sbin/searchd
+	RETVAL=$?
+	[ $RETVAL -eq 0 ] && touch /var/lock/subsys/sphinx
 }
 
 stop() {
-	if [ -f /var/lock/subsys/sphinx ]; then
-		# Stop daemons.
-		msg_stopping sphinx
-		killproc sphinx
-		rm -f /var/lock/subsys/sphinx
-	else
-		msg_not_running sphinx
+	if [ ! -f /var/lock/subsys/sphinx ]; then
+		msg_not_running "sphinx searchd"
+		return
 	fi
+
+	# Stop daemons.
+	msg_stopping "sphinx searchd"
+	killproc sphinx
+	rm -f /var/lock/subsys/sphinx
 }
 
-reload() {
-	if [ -f /var/lock/subsys/sphinx ]; then
-		msg_reloading sphinx
-		killproc sphinx -HUP
-		RETVAL=$?
-	else
-		msg_not_running sphinx
-		RETVAL=7
+condrestart() {
+	if [ ! -f /var/lock/subsys/sphinx ]; then
+		msg_not_running "sphinx searchd"
+		RETVAL=$1
+		return
 	fi
+
+	stop
+	start
 }
 
 RETVAL=0
@@ -75,12 +79,18 @@ case "$1" in
 	stop
 	start
 	;;
+  try-restart)
+	condrestart 0
+	;;
+  force-reload)
+	condrestart 7
+	;;
   status)
 	status sphinx
 	RETVAL=$?
 	;;
   *)
-	msg_usage "$0 {start|stop|restart|status}"
+	msg_usage "$0 {start|stop|restart|try-restart|force-reload|status}"
 	exit 3
 esac
 
