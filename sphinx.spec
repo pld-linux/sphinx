@@ -14,6 +14,8 @@
 %endif
 
 %{?with_java:%include	/usr/lib/rpm/macros.java}
+%include	/usr/lib/rpm/macros.php
+%define		php_min_version 5.0.4
 Summary:	Free open-source SQL full-text search engine
 Summary(pl.UTF-8):	Silnik przeszukiwania pełnotekstowego SQL open-source
 Name:		sphinx
@@ -35,6 +37,7 @@ BuildRequires:	libstdc++-devel
 %{?with_mysql:BuildRequires:	mysql-devel}
 %{?with_pgsql:BuildRequires:	postgresql-devel}
 BuildRequires:	rpm-javaprov
+BuildRequires:	rpm-php-pearprov >= 4.4.2-11
 BuildRequires:	rpmbuild(macros) >= 1.461
 BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
 
@@ -106,7 +109,8 @@ API Javy dla Sphinksa.
 Summary:	PHP API for Sphinx
 Summary(pl.UTF-8):	API PHP dla Sphinksa
 Group:		Libraries
-Requires:	php-common >= 4:5.0.4
+Requires:	php-common >= 4:%{php_min_version}
+Requires:	php-mbstring
 
 %description -n php-sphinx
 PHP API for Sphinx.
