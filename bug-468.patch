@@ -1,0 +1,14 @@
+http://www.sphinxsearch.com/bugs/view.php?id=468
+http://code.google.com/p/sphinxsearch/source/detail?r=2225
+
+--- sphinx-0.9.9/api/libsphinxclient/sphinxclient.c~	2009-11-14 01:23:06.000000000 +0200
++++ sphinx-0.9.9/api/libsphinxclient/sphinxclient.c	2010-03-31 00:51:23.815645056 +0300
+@@ -277,7 +277,7 @@
+ }
+ 
+ 
+-void sock_close ( int sock );
++static void sock_close ( int sock );
+ 
+ void sphinx_destroy ( sphinx_client * client )
+ {
