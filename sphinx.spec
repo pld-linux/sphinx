@@ -19,12 +19,12 @@
 Summary:	Free open-source SQL full-text search engine
 Summary(pl.UTF-8):	Silnik przeszukiwania pełnotekstowego SQL open-source
 Name:		sphinx
-Version:	0.9.8.1
-Release:	2
+Version:	0.9.9
+Release:	1
 License:	GPL v2
 Group:		Applications/Databases
 Source0:	http://www.sphinxsearch.com/downloads/%{name}-%{version}.tar.gz
-# Source0-md5:	428a14df41fb425e664d9e2d6178c037
+# Source0-md5:	7b9b618cb9b378f949bb1b91ddcc4f54
 Source1:	%{name}.init
 Patch0:		%{name}-system-libstemmer.patch
 URL:		http://www.sphinxsearch.com/
@@ -174,7 +174,7 @@ install -d $RPM_BUILD_ROOT{%{_sbindir},/etc/rc.d/init.d}
 rm -f $RPM_BUILD_ROOT%{_sysconfdir}/example.sql
 mv $RPM_BUILD_ROOT%{_sysconfdir}/sphinx.conf{.dist,}
 mv $RPM_BUILD_ROOT{%{_bindir},%{_sbindir}}/searchd
-install %{SOURCE1} $RPM_BUILD_ROOT/etc/rc.d/init.d/%{name}
+install -p %{SOURCE1} $RPM_BUILD_ROOT/etc/rc.d/init.d/%{name}
 
 install -d $RPM_BUILD_ROOT%{php_data_dir}
 cp -a api/sphinxapi.php $RPM_BUILD_ROOT%{php_data_dir}
@@ -185,7 +185,7 @@ cp -a api/sphinxapi.php $RPM_BUILD_ROOT%{php_data_dir}
 
 # python api
 install -d $RPM_BUILD_ROOT%{py_sitescriptdir}
-install api/sphinxapi.py $RPM_BUILD_ROOT%{py_sitescriptdir}
+cp -a api/sphinxapi.py $RPM_BUILD_ROOT%{py_sitescriptdir}
 %py_comp $RPM_BUILD_ROOT%{py_sitescriptdir}
 %py_ocomp $RPM_BUILD_ROOT%{py_sitescriptdir}
 %py_postclean
@@ -211,6 +211,7 @@ rm -rf $RPM_BUILD_ROOT
 %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/sphinx.conf
 %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/sphinx-min.conf.dist
 %attr(755,root,root) %{_bindir}/indexer
+%attr(755,root,root) %{_bindir}/indextool
 %attr(755,root,root) %{_bindir}/search
 %attr(755,root,root) %{_bindir}/spelldump
 %attr(755,root,root) %{_sbindir}/searchd
@@ -244,4 +245,4 @@ rm -rf $RPM_BUILD_ROOT
 
 %files -n python-sphinx
 %defattr(644,root,root,755)
-%{py_sitescriptdir}/*.py?
+%{py_sitescriptdir}/*.py[co]
