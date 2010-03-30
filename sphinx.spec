@@ -1,6 +1,6 @@
-#
 # TODO:
 #  - package for ruby API
+#  - run daemon under sphinx user
 #
 # Conditional build:
 %bcond_without	java		# without Java support
@@ -20,13 +20,14 @@ Summary:	Free open-source SQL full-text search engine
 Summary(pl.UTF-8):	Silnik przeszukiwania pełnotekstowego SQL open-source
 Name:		sphinx
 Version:	0.9.9
-Release:	1
+Release:	0.1
 License:	GPL v2
 Group:		Applications/Databases
 Source0:	http://www.sphinxsearch.com/downloads/%{name}-%{version}.tar.gz
 # Source0-md5:	7b9b618cb9b378f949bb1b91ddcc4f54
 Source1:	%{name}.init
 Patch0:		%{name}-system-libstemmer.patch
+Patch1:		bug-468.patch
 URL:		http://www.sphinxsearch.com/
 BuildRequires:	autoconf
 BuildRequires:	automake
@@ -39,6 +40,14 @@ BuildRequires:	libstdc++-devel
 BuildRequires:	rpm-javaprov
 BuildRequires:	rpm-php-pearprov >= 4.4.2-11
 BuildRequires:	rpmbuild(macros) >= 1.461
+Requires(postun):	/usr/sbin/groupdel
+Requires(postun):	/usr/sbin/userdel
+Requires(pre):	/bin/id
+Requires(pre):	/usr/bin/getgid
+Requires(pre):	/usr/sbin/groupadd
+Requires(pre):	/usr/sbin/useradd
+Provides:	group(sphinx)
+Provides:	user(sphinx)
 BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
 
 %description
@@ -133,6 +142,7 @@ API Pythona dla Sphinksa.
 %prep
 %setup -q
 %patch0 -p1
+%patch1 -p1
 
 %build
 %{__aclocal}
@@ -173,6 +183,7 @@ install -d $RPM_BUILD_ROOT{%{_sbindir},/etc/rc.d/init.d}
 
 rm -f $RPM_BUILD_ROOT%{_sysconfdir}/example.sql
 mv $RPM_BUILD_ROOT%{_sysconfdir}/sphinx.conf{.dist,}
+rm $RPM_BUILD_ROOT%{_sysconfdir}/sphinx-min.conf.dist
 mv $RPM_BUILD_ROOT{%{_bindir},%{_sbindir}}/searchd
 install -p %{SOURCE1} $RPM_BUILD_ROOT/etc/rc.d/init.d/%{name}
 
@@ -205,11 +216,24 @@ rm -rf $RPM_BUILD_ROOT
 %post	-n libsphinxclient -p /sbin/ldconfig
 %postun	-n libsphinxclient -p /sbin/ldconfig
 
+%pre
+%groupadd -g 249 sphinx
+%useradd -u 249 -d %{_localstatedir}/lib/%{name} -g sphinx -c "Sphinx Search" sphinx
+
+%post
+/sbin/chkconfig --add sphinx
+%service sphinx restart
+
+%preun
+if [ $1 = 0 ] ; then
+	%service sphinx stop
+	/sbin/chkconfig --del sphinx
+fi
+
 %files
 %defattr(644,root,root,755)
 %doc doc/sphinx.txt example.sql
 %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/sphinx.conf
-%config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/sphinx-min.conf.dist
 %attr(755,root,root) %{_bindir}/indexer
 %attr(755,root,root) %{_bindir}/indextool
 %attr(755,root,root) %{_bindir}/search
