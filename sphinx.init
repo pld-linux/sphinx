@@ -1,10 +1,11 @@
 #!/bin/sh
 #
-# sphinx	sphinx short service description
+# sphinx searchd Free open-source SQL full-text search engine
 #
-# chkconfig:	345 <start_level> <stop_level>
+# chkconfig:	345 20 80
 #
-# description:	sphinx long service description
+# description: Starts and stops the sphinx searchd daemon that handles \
+#	       all search requests.
 #
 # $Id$
 
