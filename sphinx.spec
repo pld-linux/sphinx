@@ -7,13 +7,18 @@
 %bcond_without	libstemmer	# without libstemmer support
 %bcond_without	mysql		# without MySQL support
 %bcond_without	pgsql		# without PostgreSQL support
-#
-%include	/usr/lib/rpm/macros.java
+
+# arch list synced with java-sun
+%ifnarch i586 i686 pentium3 pentium4 athlon %{x8664}
+%undefine	with_java
+%endif
+
+%{?with_java:%include	/usr/lib/rpm/macros.java}
 Summary:	Free open-source SQL full-text search engine
 Summary(pl.UTF-8):	Silnik przeszukiwania pełnotekstowego SQL open-source
 Name:		sphinx
 Version:	0.9.8.1
-Release:	1
+Release:	2
 License:	GPL v2
 Group:		Applications/Databases
 Source0:	http://www.sphinxsearch.com/downloads/%{name}-%{version}.tar.gz
