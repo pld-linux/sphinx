@@ -38,7 +38,7 @@ start() {
 	fi
 
 	msg_starting "sphinx searchd"
-    daemon --user=sphinx /usr/sbin/searchd --config /etc/sphinx/sphinx.conf
+    daemon --user sphinx /usr/sbin/searchd --config /etc/sphinx/sphinx.conf
 	RETVAL=$?
 	[ $RETVAL -eq 0 ] && touch /var/lock/subsys/sphinx
 }
