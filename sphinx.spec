@@ -19,7 +19,7 @@ Summary:	Free open-source SQL full-text search engine
 Summary(pl.UTF-8):	Silnik przeszukiwania pełnotekstowego SQL open-source
 Name:		sphinx
 Version:	0.9.9
-Release:	1.6
+Release:	1.7
 License:	GPL v2
 Group:		Applications/Databases
 Source0:	http://www.sphinxsearch.com/downloads/%{name}-%{version}.tar.gz
@@ -188,7 +188,7 @@ export JAVA_HOME="%{java_home}"
 
 %install
 rm -rf $RPM_BUILD_ROOT
-install -d $RPM_BUILD_ROOT{%{_sbindir},/etc/{logrotate.d,rc.d/init.d},/var/{log,run,lib}/%{name}}
+install -d $RPM_BUILD_ROOT{%{_sbindir},/etc/{logrotate.d,rc.d/init.d},/var/{log,run,lib}/%{name},/var/log/archive/%{name}}
 
 %{__make} -j1 install \
 	DESTDIR=$RPM_BUILD_ROOT
@@ -262,6 +262,7 @@ fi
 
 %dir %attr(771,root,sphinx) /var/run/sphinx
 %dir %attr(770,root,sphinx) /var/log/sphinx
+%dir %attr(770,root,sphinx) /var/log/archive/sphinx
 %dir %attr(770,root,sphinx) /var/lib/sphinx
 
 %files -n libsphinxclient

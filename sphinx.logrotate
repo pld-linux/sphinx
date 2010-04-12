@@ -7,4 +7,5 @@
 	compress
 	notifempty
 	missingok
+	olddir /var/log/archive/sphinx
 }
