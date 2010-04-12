@@ -51,7 +51,7 @@ stop() {
 
 	# Stop daemons.
 	msg_stopping "sphinx searchd"
-	killproc sphinx
+	killproc searchd
 	rm -f /var/lock/subsys/sphinx
 }
 
