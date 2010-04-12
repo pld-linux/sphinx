@@ -1,6 +1,5 @@
 # TODO:
 #  - package for ruby API
-#  - run daemon under sphinx user
 #
 # Conditional build:
 %bcond_without	java		# without Java support
@@ -20,7 +19,7 @@ Summary:	Free open-source SQL full-text search engine
 Summary(pl.UTF-8):	Silnik przeszukiwania pełnotekstowego SQL open-source
 Name:		sphinx
 Version:	0.9.9
-Release:	1.3
+Release:	1.5
 License:	GPL v2
 Group:		Applications/Databases
 Source0:	http://www.sphinxsearch.com/downloads/%{name}-%{version}.tar.gz
@@ -146,6 +145,13 @@ API Pythona dla Sphinksa.
 %patch0 -p1
 %patch1 -p1
 
+sed -i -e '
+	s#/var/run/#/var/run/sphinx/#
+	s#@CONFDIR@/log/searchd.pid#/var/run/sphinx/searchd.pid#
+	s#@CONFDIR@/log/#/var/log/sphinx/#g
+	s#@CONFDIR@/data/#/var/lib/sphinx/#g
+' sphinx*.conf.in
+
 %build
 %{__aclocal}
 %{__autoconf}
@@ -181,7 +187,7 @@ export JAVA_HOME="%{java_home}"
 
 %install
 rm -rf $RPM_BUILD_ROOT
-install -d $RPM_BUILD_ROOT{%{_sbindir},/etc/rc.d/init.d,%{_localstatedir}/{log,run,lib}/%{name}}
+install -d $RPM_BUILD_ROOT{%{_sbindir},/etc/rc.d/init.d,/var/{log,run,lib}/%{name}}
 
 %{__make} -j1 install \
 	DESTDIR=$RPM_BUILD_ROOT
@@ -227,7 +233,7 @@ rm -rf $RPM_BUILD_ROOT
 
 %pre
 %groupadd -g 249 sphinx
-%useradd -u 249 -d %{_localstatedir}/lib/%{name} -g sphinx -c "Sphinx Search" sphinx
+%useradd -u 249 -d /var/lib/%{name} -g sphinx -c "Sphinx Search" sphinx
 
 %post
 /sbin/chkconfig --add sphinx
@@ -250,6 +256,10 @@ fi
 %attr(755,root,root) %{_bindir}/search
 %attr(755,root,root) %{_bindir}/spelldump
 %attr(755,root,root) %{_sbindir}/searchd
+
+%dir %attr(771,root,sphinx) /var/run/sphinx
+%dir %attr(770,root,sphinx) /var/log/sphinx
+%dir %attr(770,root,sphinx) /var/lib/sphinx
 
 %files -n libsphinxclient
 %defattr(644,root,root,755)
