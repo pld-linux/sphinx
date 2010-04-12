@@ -20,7 +20,7 @@ Summary:	Free open-source SQL full-text search engine
 Summary(pl.UTF-8):	Silnik przeszukiwania pełnotekstowego SQL open-source
 Name:		sphinx
 Version:	0.9.9
-Release:	0.1
+Release:	1.3
 License:	GPL v2
 Group:		Applications/Databases
 Source0:	http://www.sphinxsearch.com/downloads/%{name}-%{version}.tar.gz
@@ -49,6 +49,8 @@ Requires(pre):	/usr/sbin/useradd
 Provides:	group(sphinx)
 Provides:	user(sphinx)
 BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
+
+%define		_sysconfdir	/etc/%{name}
 
 %description
 Sphinx is a a standalone search engine, meant to provide fast,
@@ -155,6 +157,9 @@ CPPFLAGS=-D_FILE_OFFSET_BITS=64
 	--with%{!?with_pgsql:out}-pgsql \
 	--with%{!?with_mysql:out}-mysql
 %{__make} -j1
+# use .conf ext for %doc
+cp -f sphinx.conf.dist sphinx.conf
+cp -f sphinx-min.conf.dist sphinx-min.conf
 
 # libsphinxclient
 cd api/libsphinxclient
@@ -176,13 +181,17 @@ export JAVA_HOME="%{java_home}"
 
 %install
 rm -rf $RPM_BUILD_ROOT
-install -d $RPM_BUILD_ROOT{%{_sbindir},/etc/rc.d/init.d}
+install -d $RPM_BUILD_ROOT{%{_sbindir},/etc/rc.d/init.d,%{_localstatedir}/{log,run,lib}/%{name}}
 
 %{__make} -j1 install \
 	DESTDIR=$RPM_BUILD_ROOT
 
-rm -f $RPM_BUILD_ROOT%{_sysconfdir}/example.sql
-mv $RPM_BUILD_ROOT%{_sysconfdir}/sphinx.conf{.dist,}
+rm $RPM_BUILD_ROOT%{_sysconfdir}/example.sql
+rm $RPM_BUILD_ROOT%{_sysconfdir}/sphinx.conf.dist
+
+# create default config with no index definition
+sed -e '/## data source definition/,/## indexer settings/d' sphinx.conf > $RPM_BUILD_ROOT%{_sysconfdir}/sphinx.conf
+
 rm $RPM_BUILD_ROOT%{_sysconfdir}/sphinx-min.conf.dist
 mv $RPM_BUILD_ROOT{%{_bindir},%{_sbindir}}/searchd
 install -p %{SOURCE1} $RPM_BUILD_ROOT/etc/rc.d/init.d/%{name}
@@ -225,21 +234,22 @@ rm -rf $RPM_BUILD_ROOT
 %service sphinx restart
 
 %preun
-if [ $1 = 0 ] ; then
+if [ "$1" = 0 ]; then
 	%service sphinx stop
 	/sbin/chkconfig --del sphinx
 fi
 
 %files
 %defattr(644,root,root,755)
-%doc doc/sphinx.txt example.sql
+%doc doc/sphinx.txt example.sql sphinx.conf sphinx-min.conf
+%dir %{_sysconfdir}
 %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/sphinx.conf
+%attr(754,root,root) /etc/rc.d/init.d/%{name}
 %attr(755,root,root) %{_bindir}/indexer
 %attr(755,root,root) %{_bindir}/indextool
 %attr(755,root,root) %{_bindir}/search
 %attr(755,root,root) %{_bindir}/spelldump
 %attr(755,root,root) %{_sbindir}/searchd
-%attr(754,root,root) /etc/rc.d/init.d/%{name}
 
 %files -n libsphinxclient
 %defattr(644,root,root,755)
