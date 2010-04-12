@@ -19,12 +19,13 @@ Summary:	Free open-source SQL full-text search engine
 Summary(pl.UTF-8):	Silnik przeszukiwania pełnotekstowego SQL open-source
 Name:		sphinx
 Version:	0.9.9
-Release:	1.5
+Release:	1.6
 License:	GPL v2
 Group:		Applications/Databases
 Source0:	http://www.sphinxsearch.com/downloads/%{name}-%{version}.tar.gz
 # Source0-md5:	7b9b618cb9b378f949bb1b91ddcc4f54
 Source1:	%{name}.init
+Source2:	%{name}.logrotate
 Patch0:		%{name}-system-libstemmer.patch
 Patch1:		bug-468.patch
 URL:		http://www.sphinxsearch.com/
@@ -187,7 +188,7 @@ export JAVA_HOME="%{java_home}"
 
 %install
 rm -rf $RPM_BUILD_ROOT
-install -d $RPM_BUILD_ROOT{%{_sbindir},/etc/rc.d/init.d,/var/{log,run,lib}/%{name}}
+install -d $RPM_BUILD_ROOT{%{_sbindir},/etc/{logrotate.d,rc.d/init.d},/var/{log,run,lib}/%{name}}
 
 %{__make} -j1 install \
 	DESTDIR=$RPM_BUILD_ROOT
@@ -201,6 +202,7 @@ sed -e '/## data source definition/,/## indexer settings/d' sphinx.conf > $RPM_B
 rm $RPM_BUILD_ROOT%{_sysconfdir}/sphinx-min.conf.dist
 mv $RPM_BUILD_ROOT{%{_bindir},%{_sbindir}}/searchd
 install -p %{SOURCE1} $RPM_BUILD_ROOT/etc/rc.d/init.d/%{name}
+cp -a %{SOURCE2} $RPM_BUILD_ROOT/etc/logrotate.d/%{name}
 
 install -d $RPM_BUILD_ROOT%{php_data_dir}
 cp -a api/sphinxapi.php $RPM_BUILD_ROOT%{php_data_dir}
@@ -250,6 +252,7 @@ fi
 %doc doc/sphinx.txt example.sql sphinx.conf sphinx-min.conf
 %dir %{_sysconfdir}
 %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/sphinx.conf
+%config(noreplace) %verify(not md5 mtime size) /etc/logrotate.d/%{name}
 %attr(754,root,root) /etc/rc.d/init.d/%{name}
 %attr(755,root,root) %{_bindir}/indexer
 %attr(755,root,root) %{_bindir}/indextool
