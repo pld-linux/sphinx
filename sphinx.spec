@@ -7,10 +7,7 @@
 %bcond_without	mysql		# without MySQL support
 %bcond_without	pgsql		# without PostgreSQL support
 
-# arch list synced with java-sun
-%ifnarch i586 i686 pentium3 pentium4 athlon %{x8664}
 %undefine	with_java
-%endif
 
 %{?with_java:%include	/usr/lib/rpm/macros.java}
 %include	/usr/lib/rpm/macros.php
@@ -32,7 +29,7 @@ URL:		http://www.sphinxsearch.com/
 BuildRequires:	autoconf
 BuildRequires:	automake
 BuildRequires:	expat-devel
-%{?with_java:BuildRequires:	java-sun}
+%{?with_java:BuildRequires:	jdk}
 BuildRequires:	libstdc++-devel
 %{?with_libstemmer:BuildRequires:	libstemmer-devel}
 %{?with_mysql:BuildRequires:	mysql-devel}
