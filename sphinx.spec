@@ -32,10 +32,14 @@ BuildRequires:	expat-devel
 %{?with_java:BuildRequires:	jdk}
 BuildRequires:	libstdc++-devel
 %{?with_libstemmer:BuildRequires:	libstemmer-devel}
+BuildRequires:	libtool
 %{?with_mysql:BuildRequires:	mysql-devel}
 %{?with_pgsql:BuildRequires:	postgresql-devel}
+BuildRequires:	python
+BuildRequires:	python-modules
 BuildRequires:	rpm-javaprov
 BuildRequires:	rpm-php-pearprov >= 4.4.2-11
+BuildRequires:	rpm-pythonprov
 BuildRequires:	rpmbuild(macros) >= 1.461
 Requires(postun):	/usr/sbin/groupdel
 Requires(postun):	/usr/sbin/userdel
