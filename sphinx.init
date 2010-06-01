@@ -55,6 +55,18 @@ stop() {
 	rm -f /var/lock/subsys/sphinx
 }
 
+reload() {
+	if [ ! -f /var/lock/subsys/sphinx ]; then
+		msg_not_running "sphinx searchd"
+		RETVAL=7
+		return
+	fi
+
+	msg_reloading "sphinx searchd"
+	killproc searchd -HUP
+	RETVAL=$?
+}
+
 condrestart() {
 	if [ ! -f /var/lock/subsys/sphinx ]; then
 		msg_not_running "sphinx searchd"
@@ -82,8 +94,8 @@ case "$1" in
   try-restart)
 	condrestart 0
 	;;
-  force-reload)
-	condrestart 7
+  reload|force-reload)
+  	reload
 	;;
   status)
 	status sphinx searchd
