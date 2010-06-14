@@ -1,5 +1,8 @@
 # TODO:
 #  - package for ruby API
+#  - subpackage for driver backend deps if code patched to support it:
+#    sphinx-0.9.9-2.i686: required "libodbc.so.1" is provided by following packages:
+#    libmysqlclient.so.16 libmysqlclient.so.16(libmysqlclient_16) libpq.so.5
 #
 # Conditional build:
 %bcond_without	java		# without Java support
@@ -251,8 +254,8 @@ fi
 %files
 %defattr(644,root,root,755)
 %doc doc/sphinx.txt example.sql sphinx.conf sphinx-min.conf
-%dir %{_sysconfdir}
-%config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/sphinx.conf
+%dir %attr(750,root,sphinx) %{_sysconfdir}
+%config(noreplace) %verify(not md5 mtime size) %attr(640,root,sphinx) %{_sysconfdir}/sphinx.conf
 %config(noreplace) %verify(not md5 mtime size) /etc/logrotate.d/%{name}
 %attr(754,root,root) /etc/rc.d/init.d/%{name}
 %attr(755,root,root) %{_bindir}/indexer
