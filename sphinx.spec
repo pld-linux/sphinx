@@ -125,6 +125,7 @@ Summary:	PHP API for Sphinx
 Summary(pl.UTF-8):	API PHP dla Sphinksa
 Group:		Libraries
 Requires:	php-common >= 4:%{php_min_version}
+Provides:	php(sphinx)
 
 %description -n php-sphinx
 PHP API for Sphinx.
