@@ -81,7 +81,7 @@ Group:		Libraries
 %description -n libsphinxclient
 This package provides a client library for Sphinx search engine.
 
-%description -n libsphinxclient -l PL.UTF_8
+%description -n libsphinxclient -l pl.UTF-8
 Ten pakiet dostarcza bibliotekę kliencką do silnika Sphinx.
 
 %package -n libsphinxclient-devel
