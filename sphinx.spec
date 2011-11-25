@@ -19,13 +19,14 @@ Summary:	Free open-source SQL full-text search engine
 Summary(pl.UTF-8):	Silnik przeszukiwania pełnotekstowego SQL open-source
 Name:		sphinx
 Version:	0.9.9
-Release:	7
+Release:	8
 License:	GPL v2
 Group:		Applications/Databases
 Source0:	http://www.sphinxsearch.com/downloads/%{name}-%{version}.tar.gz
 # Source0-md5:	7b9b618cb9b378f949bb1b91ddcc4f54
 Source1:	%{name}.init
 Source2:	%{name}.logrotate
+Source3:	%{name}.conf.sh
 Patch0:		%{name}-system-libstemmer.patch
 Patch1:		bug-468.patch
 Patch2:		bug-297.patch
@@ -203,15 +204,18 @@ rm $RPM_BUILD_ROOT%{_sysconfdir}/example.sql
 rm $RPM_BUILD_ROOT%{_sysconfdir}/sphinx.conf.dist
 
 # create default config with no index definition
-sed -e '/## data source definition/,/## indexer settings/d' sphinx.conf > $RPM_BUILD_ROOT%{_sysconfdir}/sphinx.conf
+sed -e '/## data source definition/,/## indexer settings/d' sphinx.conf > $RPM_BUILD_ROOT%{_sysconfdir}/sphinx-common.conf
+# dir for indexes definition
+install -d $RPM_BUILD_ROOT%{_sysconfdir}/index.d
 
 rm $RPM_BUILD_ROOT%{_sysconfdir}/sphinx-min.conf.dist
 mv $RPM_BUILD_ROOT{%{_bindir},%{_sbindir}}/searchd
 install -p %{SOURCE1} $RPM_BUILD_ROOT/etc/rc.d/init.d/%{name}
-cp -a %{SOURCE2} $RPM_BUILD_ROOT/etc/logrotate.d/%{name}
+cp -p %{SOURCE2} $RPM_BUILD_ROOT/etc/logrotate.d/%{name}
+install -p %{SOURCE3} $RPM_BUILD_ROOT%{_sysconfdir}/%{name}.conf
 
 install -d $RPM_BUILD_ROOT%{php_data_dir}
-cp -a api/sphinxapi.php $RPM_BUILD_ROOT%{php_data_dir}
+cp -p api/sphinxapi.php $RPM_BUILD_ROOT%{php_data_dir}
 
 # libsphinxclient
 %{__make} -C api/libsphinxclient install \
@@ -219,7 +223,7 @@ cp -a api/sphinxapi.php $RPM_BUILD_ROOT%{php_data_dir}
 
 # python api
 install -d $RPM_BUILD_ROOT%{py_sitescriptdir}
-cp -a api/sphinxapi.py $RPM_BUILD_ROOT%{py_sitescriptdir}
+cp -p api/sphinxapi.py $RPM_BUILD_ROOT%{py_sitescriptdir}
 %py_comp $RPM_BUILD_ROOT%{py_sitescriptdir}
 %py_ocomp $RPM_BUILD_ROOT%{py_sitescriptdir}
 %py_postclean
@@ -229,7 +233,7 @@ cp -a api/sphinxapi.py $RPM_BUILD_ROOT%{py_sitescriptdir}
 # java api
 %if %{with java}
 install -d $RPM_BUILD_ROOT%{_javadir}
-cp -a api/java/sphinxapi.jar $RPM_BUILD_ROOT%{_javadir}/%{name}-%{version}.jar
+cp -p api/java/sphinxapi.jar $RPM_BUILD_ROOT%{_javadir}/%{name}-%{version}.jar
 ln -s %{name}-%{version}.jar $RPM_BUILD_ROOT%{_javadir}/%{name}.jar
 %endif
 
@@ -253,11 +257,25 @@ if [ "$1" = 0 ]; then
 	/sbin/chkconfig --del sphinx
 fi
 
+%triggerpostun -- %{name} < 0.9.9-7.6
+if [ -f %{_sysconfdir}/sphinx.conf.rpmsave ]; then
+	cp -f %{_sysconfdir}/sphinx-common.conf{,.rpmnew}
+	mv -f %{_sysconfdir}/sphinx.conf.rpmsave %{_sysconfdir}/sphinx-common.conf
+	%service -q sphinx restart
+fi
+
 %files
 %defattr(644,root,root,755)
 %doc doc/sphinx.txt example.sql sphinx.conf sphinx-min.conf
+
 %dir %attr(750,root,sphinx) %{_sysconfdir}
-%config(noreplace) %verify(not md5 mtime size) %attr(640,root,sphinx) %{_sysconfdir}/sphinx.conf
+# main sphinx config
+%config(noreplace) %verify(not md5 mtime size) %attr(640,root,sphinx) %{_sysconfdir}/sphinx-common.conf
+# shell wrapper which loads main config and extra indexes config
+%attr(755,root,sphinx) %{_sysconfdir}/sphinx.conf
+# put here *.conf files defining extra indexes
+%dir %attr(750,root,sphinx) %{_sysconfdir}/index.d
+
 %config(noreplace) %verify(not md5 mtime size) /etc/logrotate.d/%{name}
 %attr(754,root,root) /etc/rc.d/init.d/%{name}
 %attr(755,root,root) %{_bindir}/indexer
