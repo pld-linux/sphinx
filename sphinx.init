@@ -18,6 +18,7 @@
 . /etc/sysconfig/network
 
 # Get service config - may override defaults
+SEARCHD_CONFIG=/etc/sphinx/sphinx.conf
 [ -f /etc/sysconfig/sphinx ] && . /etc/sysconfig/sphinx
 
 # Check that networking is up.
@@ -38,7 +39,7 @@ start() {
 	fi
 
 	msg_starting "sphinx searchd"
-    daemon --user sphinx /usr/sbin/searchd --config /etc/sphinx/sphinx.conf
+    daemon --user sphinx /usr/sbin/searchd --config $SEARCHD_CONFIG
 	RETVAL=$?
 	[ $RETVAL -eq 0 ] && touch /var/lock/subsys/sphinx
 }
