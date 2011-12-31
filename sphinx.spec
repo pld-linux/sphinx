@@ -18,18 +18,17 @@
 Summary:	Free open-source SQL full-text search engine
 Summary(pl.UTF-8):	Silnik przeszukiwania pełnotekstowego SQL open-source
 Name:		sphinx
-Version:	0.9.9
-Release:	8
+Version:	2.0.3
+Release:	1
 License:	GPL v2
 Group:		Applications/Databases
-Source0:	http://www.sphinxsearch.com/downloads/%{name}-%{version}.tar.gz
-# Source0-md5:	7b9b618cb9b378f949bb1b91ddcc4f54
+Source0:	http://sphinxsearch.com/files/%{name}-%{version}-release.tar.gz
+# Source0-md5:	a1293aecd5034aa797811610beb7ba89
 Source1:	%{name}.init
 Source2:	%{name}.logrotate
 Source3:	%{name}.conf.sh
 Patch0:		%{name}-system-libstemmer.patch
 Patch1:		bug-468.patch
-Patch2:		bug-297.patch
 URL:		http://www.sphinxsearch.com/
 BuildRequires:	autoconf
 BuildRequires:	automake
@@ -148,10 +147,9 @@ Python API for Sphinx.
 API Pythona dla Sphinksa.
 
 %prep
-%setup -q
+%setup -q -n %{name}-%{version}-release
 %patch0 -p1
 %patch1 -p1
-%patch2 -p1
 
 sed -i -e '
 	s#/var/run/#/var/run/sphinx/#
@@ -169,7 +167,8 @@ CPPFLAGS=-D_FILE_OFFSET_BITS=64
 %configure \
 	--with%{!?with_libstemmer:out}-libstemmer \
 	--with%{!?with_pgsql:out}-pgsql \
-	--with%{!?with_mysql:out}-mysql
+	--with%{!?with_mysql:out}-mysql \
+	--with-syslog
 %{__make} -j1
 # use .conf ext for %doc
 cp -f sphinx.conf.dist sphinx.conf
@@ -283,6 +282,12 @@ fi
 %attr(755,root,root) %{_bindir}/search
 %attr(755,root,root) %{_bindir}/spelldump
 %attr(755,root,root) %{_sbindir}/searchd
+
+%{_mandir}/man1/indexer.1*
+%{_mandir}/man1/indextool.1*
+%{_mandir}/man1/search.1*
+%{_mandir}/man1/searchd.1*
+%{_mandir}/man1/spelldump.1*
 
 %dir %attr(771,root,sphinx) /var/run/sphinx
 %dir %attr(770,root,sphinx) /var/log/sphinx

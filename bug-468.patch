@@ -12,3 +12,12 @@ http://code.google.com/p/sphinxsearch/source/detail?r=2225
  
  void sphinx_destroy ( sphinx_client * client )
  {
+@@ -1253,7 +1253,7 @@
+ }
+ 
+ 
+-void sock_close ( int sock )
++static void sock_close ( int sock )
+ {
+ 	if ( sock<0 )
+ 		return;
