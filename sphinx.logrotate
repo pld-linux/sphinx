@@ -1,5 +1,6 @@
 /var/log/sphinx/*.log
 {
+	su root sphinx
 	weekly
 	rotate 10
 	copytruncate
