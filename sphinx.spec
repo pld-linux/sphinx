@@ -27,6 +27,7 @@ Source0:	http://sphinxsearch.com/files/%{name}-%{version}-release.tar.gz
 Source1:	%{name}.init
 Source2:	%{name}.logrotate
 Source3:	%{name}.conf.sh
+Source4:	%{name}.tmpfiles
 Patch0:		%{name}-system-libstemmer.patch
 Patch1:		bug-468.patch
 URL:		http://www.sphinxsearch.com/
@@ -195,7 +196,9 @@ export JAVA_HOME="%{java_home}"
 
 %install
 rm -rf $RPM_BUILD_ROOT
-install -d $RPM_BUILD_ROOT{%{_sbindir},/etc/{logrotate.d,rc.d/init.d},/var/{log,run,lib}/%{name},/var/log/archive/%{name}}
+install -d $RPM_BUILD_ROOT{%{_sbindir},/etc/{logrotate.d,rc.d/init.d}}\
+	$RPM_BUILD_ROOT{/var/{log,run,lib}/%{name},/var/log/archive/%{name}} \
+	$RPM_BUILD_ROOT/usr/lib/tmpfiles.d
 
 %{__make} -j1 install \
 	DESTDIR=$RPM_BUILD_ROOT
@@ -213,6 +216,7 @@ mv $RPM_BUILD_ROOT{%{_bindir},%{_sbindir}}/searchd
 install -p %{SOURCE1} $RPM_BUILD_ROOT/etc/rc.d/init.d/%{name}
 cp -p %{SOURCE2} $RPM_BUILD_ROOT/etc/logrotate.d/%{name}
 install -p %{SOURCE3} $RPM_BUILD_ROOT%{_sysconfdir}/%{name}.conf
+install %{SOURCE4} $RPM_BUILD_ROOT/usr/lib/tmpfiles.d/%{name}.conf
 
 install -d $RPM_BUILD_ROOT%{php_data_dir}
 cp -p api/sphinxapi.php $RPM_BUILD_ROOT%{php_data_dir}
@@ -289,7 +293,7 @@ fi
 %{_mandir}/man1/search.1*
 %{_mandir}/man1/searchd.1*
 %{_mandir}/man1/spelldump.1*
-
+/usr/lib/tmpfiles.d/%{name}.conf
 %dir %attr(771,root,sphinx) /var/run/sphinx
 %dir %attr(770,root,sphinx) /var/log/sphinx
 %dir %attr(770,root,sphinx) /var/log/archive/sphinx
