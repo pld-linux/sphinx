@@ -19,7 +19,7 @@ Summary:	Free open-source SQL full-text search engine
 Summary(pl.UTF-8):	Silnik przeszukiwania pełnotekstowego SQL open-source
 Name:		sphinx
 Version:	2.0.3
-Release:	4
+Release:	5
 License:	GPL v2
 Group:		Applications/Databases
 Source0:	http://sphinxsearch.com/files/%{name}-%{version}-release.tar.gz
@@ -45,16 +45,16 @@ BuildRequires:	python-modules
 BuildRequires:	rpm-javaprov
 BuildRequires:	rpm-php-pearprov >= 4.4.2-11
 BuildRequires:	rpm-pythonprov
-BuildRequires:	rpmbuild(macros) >= 1.461
+BuildRequires:	rpmbuild(macros) >= 1.647
 Requires(postun):	/usr/sbin/groupdel
 Requires(postun):	/usr/sbin/userdel
 Requires(pre):	/bin/id
 Requires(pre):	/usr/bin/getgid
 Requires(pre):	/usr/sbin/groupadd
 Requires(pre):	/usr/sbin/useradd
-Conflicts:	logrotate < 3.8.0
 Provides:	group(sphinx)
 Provides:	user(sphinx)
+Conflicts:	logrotate < 3.8.0
 BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
 
 %define		_sysconfdir	/etc/%{name}
@@ -111,41 +111,44 @@ Static sphinxclient library.
 %description -n libsphinxclient-static -l pl.UTF-8
 Statyczna biblioteka sphinxclient.
 
-%package -n java-sphinx
+%package -n java-sphinxapi
 Summary:	Java API for Sphinx
 Summary(pl.UTF-8):	API Javy dla Sphinksa
 Group:		Development/Languages/Java
 Requires:	jpackage-utils
+Obsoletes:	java-sphinx < 2.0.3-5
 
-%description -n java-sphinx
+%description -n java-sphinxapi
 Java API for Sphinx.
 
-%description -n java-sphinx -l pl.UTF-8
+%description -n java-sphinxapi -l pl.UTF-8
 API Javy dla Sphinksa.
 
-%package -n php-sphinx
-Summary:	PHP API for Sphinx
+%package -n php-sphinxapi
+Summary:	PHP API for Sphinx Search
 Summary(pl.UTF-8):	API PHP dla Sphinksa
 Group:		Libraries
 Requires:	php-common >= 4:%{php_min_version}
 Provides:	php(sphinx)
+Obsoletes:	php-sphinx < 2.0.3-5
 
-%description -n php-sphinx
-PHP API for Sphinx.
+%description -n php-sphinxapi
+PHP API for Sphinx Search.
 
-%description -n php-sphinx -l pl.UTF-8
+%description -n php-sphinxapi -l pl.UTF-8
 API PHP dla Sphinksa.
 
-%package -n python-sphinx
-Summary:	Python API for Sphinx
+%package -n python-sphinxapi
+Summary:	Python API for Sphinx Search
 Summary(pl.UTF-8):	API Python dla Sphinksa
 Group:		Development/Languages/Python
+Obsoletes:	python-sphinx < 2.0.3-5
 %pyrequires_eq	python
 
-%description -n python-sphinx
-Python API for Sphinx.
+%description -n python-sphinxapi
+Python API for Sphinx Search.
 
-%description -n python-sphinx -l pl.UTF-8
+%description -n python-sphinxapi -l pl.UTF-8
 API Pythona dla Sphinksa.
 
 %prep
@@ -173,8 +176,8 @@ CPPFLAGS=-D_FILE_OFFSET_BITS=64
 	--with-syslog
 %{__make} -j1
 # use .conf ext for %doc
-cp -f sphinx.conf.dist sphinx.conf
-cp -f sphinx-min.conf.dist sphinx-min.conf
+cp -pf sphinx.conf.dist sphinx.conf
+cp -pf sphinx-min.conf.dist sphinx-min.conf
 
 # libsphinxclient
 cd api/libsphinxclient
@@ -198,7 +201,7 @@ export JAVA_HOME="%{java_home}"
 rm -rf $RPM_BUILD_ROOT
 install -d $RPM_BUILD_ROOT{%{_sbindir},/etc/{logrotate.d,rc.d/init.d}}\
 	$RPM_BUILD_ROOT{/var/{log,run,lib}/%{name},/var/log/archive/%{name}} \
-	$RPM_BUILD_ROOT/usr/lib/tmpfiles.d
+	$RPM_BUILD_ROOT%{systemdtmpfilesdir}
 
 %{__make} -j1 install \
 	DESTDIR=$RPM_BUILD_ROOT
@@ -216,7 +219,7 @@ mv $RPM_BUILD_ROOT{%{_bindir},%{_sbindir}}/searchd
 install -p %{SOURCE1} $RPM_BUILD_ROOT/etc/rc.d/init.d/%{name}
 cp -p %{SOURCE2} $RPM_BUILD_ROOT/etc/logrotate.d/%{name}
 install -p %{SOURCE3} $RPM_BUILD_ROOT%{_sysconfdir}/%{name}.conf
-install %{SOURCE4} $RPM_BUILD_ROOT/usr/lib/tmpfiles.d/%{name}.conf
+install %{SOURCE4} $RPM_BUILD_ROOT%{systemdtmpfilesdir}/%{name}.conf
 
 install -d $RPM_BUILD_ROOT%{php_data_dir}
 cp -p api/sphinxapi.php $RPM_BUILD_ROOT%{php_data_dir}
@@ -237,8 +240,8 @@ cp -p api/sphinxapi.py $RPM_BUILD_ROOT%{py_sitescriptdir}
 # java api
 %if %{with java}
 install -d $RPM_BUILD_ROOT%{_javadir}
-cp -p api/java/sphinxapi.jar $RPM_BUILD_ROOT%{_javadir}/%{name}-%{version}.jar
-ln -s %{name}-%{version}.jar $RPM_BUILD_ROOT%{_javadir}/%{name}.jar
+cp -p api/java/sphinxapi.jar $RPM_BUILD_ROOT%{_javadir}/sphinxapi-%{version}.jar
+ln -s sphinxapi-%{version}.jar $RPM_BUILD_ROOT%{_javadir}/sphinxapi.jar
 %endif
 
 %clean
@@ -293,7 +296,7 @@ fi
 %{_mandir}/man1/search.1*
 %{_mandir}/man1/searchd.1*
 %{_mandir}/man1/spelldump.1*
-/usr/lib/tmpfiles.d/%{name}.conf
+%{systemdtmpfilesdir}/%{name}.conf
 %dir %attr(771,root,sphinx) /var/run/sphinx
 %dir %attr(770,root,sphinx) /var/log/sphinx
 %dir %attr(770,root,sphinx) /var/log/archive/sphinx
@@ -315,16 +318,16 @@ fi
 %{_libdir}/libsphinxclient.a
 
 %if %{with java}
-%files -n java-sphinx
+%files -n java-sphinxapi
 %defattr(644,root,root,755)
 %doc api/java/README
 %{_javadir}/sphinx*.jar
 %endif
 
-%files -n php-sphinx
+%files -n php-sphinxapi
 %defattr(644,root,root,755)
 %{php_data_dir}/sphinxapi.php
 
-%files -n python-sphinx
+%files -n python-sphinxapi
 %defattr(644,root,root,755)
 %{py_sitescriptdir}/*.py[co]
