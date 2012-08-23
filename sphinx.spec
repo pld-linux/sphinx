@@ -19,7 +19,7 @@ Summary:	Free open-source SQL full-text search engine
 Summary(pl.UTF-8):	Silnik przeszukiwania pełnotekstowego SQL open-source
 Name:		sphinx
 Version:	2.0.3
-Release:	5
+Release:	6
 License:	GPL v2
 Group:		Applications/Databases
 Source0:	http://sphinxsearch.com/files/%{name}-%{version}-release.tar.gz
@@ -128,7 +128,7 @@ API Javy dla Sphinksa.
 Summary:	PHP API for Sphinx Search
 Summary(pl.UTF-8):	API PHP dla Sphinksa
 Group:		Libraries
-Requires:	php-common >= 4:%{php_min_version}
+Requires:	php(core) >= %{php_min_version}
 Provides:	php(sphinx)
 Obsoletes:	php-sphinx < 2.0.3-5
 
