@@ -98,7 +98,7 @@ diff -burN sphinx-0.9.8.orig/configure.ac sphinx-0.9.8/configure.ac
  dnl ---
  
  AC_MSG_CHECKING([whether to use 64-bit document/word IDs])
-@@ -169,22 +166,23 @@
+@@ -169,22 +166,25 @@
  
  AC_MSG_CHECKING([whether to compile with libstemmer support])
  if test x$ac_cv_use_libstemmer != xno; then
@@ -125,6 +125,8 @@ diff -burN sphinx-0.9.8.orig/configure.ac sphinx-0.9.8/configure.ac
  fi
  AM_CONDITIONAL(USE_LIBSTEMMER, test x$ac_cv_use_libstemmer != xno)
 +AM_CONDITIONAL(USE_INTERNAL_LIBSTEMMER, test x$ac_cv_use_internal_libstemmer != x0)
++
++AM_PROG_AR
 +
 +dnl ---
 +
