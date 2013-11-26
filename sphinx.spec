@@ -31,7 +31,7 @@ Source4:	%{name}.tmpfiles
 Patch0:		bug-468.patch
 URL:		http://www.sphinxsearch.com/
 BuildRequires:	autoconf
-BuildRequires:	automake
+BuildRequires:	automake >= 1:1.12
 BuildRequires:	expat-devel
 %{?with_java:BuildRequires:	jdk}
 BuildRequires:	libstdc++-devel
@@ -41,7 +41,7 @@ BuildRequires:	libtool
 %{?with_pgsql:BuildRequires:	postgresql-devel}
 BuildRequires:	python
 BuildRequires:	python-modules
-BuildRequires:	rpm-javaprov
+%{?with_java:BuildRequires:	rpm-javaprov}
 BuildRequires:	rpm-php-pearprov >= 4.4.2-11
 BuildRequires:	rpm-pythonprov
 BuildRequires:	rpmbuild(macros) >= 1.647
