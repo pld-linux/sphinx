@@ -10,8 +10,6 @@
 %bcond_without	mysql		# without MySQL support
 %bcond_without	pgsql		# without PostgreSQL support
 
-%undefine	with_java
-
 %define		php_min_version 5.0.4
 %include	/usr/lib/rpm/macros.php
 %{?with_java:%include	/usr/lib/rpm/macros.java}
