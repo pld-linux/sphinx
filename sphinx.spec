@@ -12,14 +12,14 @@
 
 %undefine	with_java
 
-%{?with_java:%include	/usr/lib/rpm/macros.java}
-%include	/usr/lib/rpm/macros.php
 %define		php_min_version 5.0.4
+%include	/usr/lib/rpm/macros.php
+%{?with_java:%include	/usr/lib/rpm/macros.java}
 Summary:	Free open-source SQL full-text search engine
 Summary(pl.UTF-8):	Silnik przeszukiwania pełnotekstowego SQL open-source
 Name:		sphinx
 Version:	2.0.8
-Release:	1
+Release:	2
 License:	GPL v2
 Group:		Applications/Databases
 Source0:	http://www.sphinxsearch.com/files/%{name}-%{version}-release.tar.gz
@@ -116,6 +116,9 @@ Summary(pl.UTF-8):	API Javy dla Sphinksa
 Group:		Development/Languages/Java
 Requires:	jpackage-utils
 Obsoletes:	java-sphinx < 2.0.3-5
+%if "%{_rpmversion}" >= "5"
+BuildArch:	noarch
+%endif
 
 %description -n java-sphinxapi
 Java API for Sphinx.
@@ -130,6 +133,9 @@ Group:		Libraries
 Requires:	php(core) >= %{php_min_version}
 Provides:	php(sphinx)
 Obsoletes:	php-sphinx < 2.0.3-5
+%if "%{_rpmversion}" >= "5"
+BuildArch:	noarch
+%endif
 
 %description -n php-sphinxapi
 PHP API for Sphinx Search.
@@ -143,6 +149,9 @@ Summary(pl.UTF-8):	API Python dla Sphinksa
 Group:		Development/Languages/Python
 Obsoletes:	python-sphinx < 2.0.3-5
 %pyrequires_eq	python
+%if "%{_rpmversion}" >= "5"
+BuildArch:	noarch
+%endif
 
 %description -n python-sphinxapi
 Python API for Sphinx Search.
