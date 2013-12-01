@@ -18,12 +18,12 @@
 Summary:	Free open-source SQL full-text search engine
 Summary(pl.UTF-8):	Silnik przeszukiwania pełnotekstowego SQL open-source
 Name:		sphinx
-Version:	2.0.9
+Version:	2.1.3
 Release:	1
 License:	GPL v2
 Group:		Applications/Databases
 Source0:	http://www.sphinxsearch.com/files/%{name}-%{version}-release.tar.gz
-# Source0-md5:	b5a2ff137c00d8490a5e1107bd0b5903
+# Source0-md5:	83918a1dedd209d489482a811e31bb4f
 Source1:	%{name}.init
 Source2:	%{name}.logrotate
 Source3:	%{name}.conf.sh
@@ -147,8 +147,8 @@ API PHP dla Sphinksa.
 Summary:	Python API for Sphinx Search
 Summary(pl.UTF-8):	API Python dla Sphinksa
 Group:		Development/Languages/Python
+Requires:	python
 Obsoletes:	python-sphinx < 2.0.3-5
-%pyrequires_eq	python
 %if "%{_rpmversion}" >= "5"
 BuildArch:	noarch
 %endif
@@ -173,10 +173,6 @@ sed -i -e '
 ' sphinx*.conf.in
 
 %build
-%{__aclocal}
-%{__autoconf}
-%{__autoheader}
-%{__automake}
 CPPFLAGS=-D_FILE_OFFSET_BITS=64
 %configure \
 	--with%{!?with_libstemmer:out}-libstemmer \
@@ -298,6 +294,7 @@ fi
 %attr(755,root,root) %{_bindir}/indextool
 %attr(755,root,root) %{_bindir}/search
 %attr(755,root,root) %{_bindir}/spelldump
+%attr(755,root,root) %{_bindir}/wordbreaker
 %attr(755,root,root) %{_sbindir}/searchd
 
 %{_mandir}/man1/indexer.1*
