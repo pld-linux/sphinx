@@ -19,7 +19,7 @@ Summary:	Free open-source SQL full-text search engine
 Summary(pl.UTF-8):	Silnik przeszukiwania pełnotekstowego SQL open-source
 Name:		sphinx
 Version:	2.0.9
-Release:	1
+Release:	2
 License:	GPL v2
 Group:		Applications/Databases
 Source0:	http://www.sphinxsearch.com/files/%{name}-%{version}-release.tar.gz
@@ -29,6 +29,7 @@ Source2:	%{name}.logrotate
 Source3:	%{name}.conf.sh
 Source4:	%{name}.tmpfiles
 Patch0:		bug-468.patch
+Patch1:		%{name}-build.patch
 URL:		http://www.sphinxsearch.com/
 BuildRequires:	autoconf
 BuildRequires:	automake >= 1:1.12
@@ -162,6 +163,7 @@ API Pythona dla Sphinksa.
 %prep
 %setup -q -n %{name}-%{version}-release
 %patch0 -p1
+%patch1 -p1
 
 sed -i -e 's#AM_MAINTAINER_MODE#AM_MAINTAINER_MODE\nAM_PROG_AR#' configure.ac
 

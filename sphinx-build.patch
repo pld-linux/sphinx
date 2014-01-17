@@ -1,0 +1,11 @@
+--- sphinx-2.0.9-release/configure.ac~	2014-01-17 11:58:46.000000000 +0100
++++ sphinx-2.0.9-release/configure.ac	2014-01-17 11:59:42.265661279 +0100
+@@ -8,7 +8,7 @@
+ SPHINX_CONFIGURE_PART([checking build environment])
+ 
+ AC_CONFIG_AUX_DIR([config])
+-AM_INIT_AUTOMAKE([-Wall -Werror foreign])
++AM_INIT_AUTOMAKE([-Wall foreign])
+ AM_MAINTAINER_MODE
+ AM_PROG_AR
+ AC_CONFIG_SRCDIR([src/searchd.cpp])
