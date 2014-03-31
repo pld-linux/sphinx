@@ -160,6 +160,8 @@ sed -i -e '
 	s#@CONFDIR@/data/#/var/lib/sphinx/#g
 ' sphinx*.conf.in
 
+sed -i -e '/AM_INIT_AUTOMAKE/ s/-Werror//' configure.ac
+
 %build
 %{__aclocal}
 %{__autoconf}
