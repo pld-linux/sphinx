@@ -314,7 +314,7 @@ fi
 %defattr(644,root,root,755)
 %attr(755,root,root) %{_libdir}/libsphinxclient.so
 %{_libdir}/libsphinxclient.la
-%{_includedir}/*.h
+%{_includedir}/sphinxclient.h
 
 %files -n libsphinxclient-static
 %defattr(644,root,root,755)
