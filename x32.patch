@@ -1,0 +1,11 @@
+--- sphinx-2.2.8-release/src/sphinxutils.cpp~	2015-01-20 08:02:07.000000000 +0100
++++ sphinx-2.2.8-release/src/sphinxutils.cpp	2015-03-15 10:30:39.062340287 +0100
+@@ -2011,7 +2011,7 @@
+ 		__asm __volatile__ ( "movl %%ebp,%0":"=r"(pFramePointer):"r"(pFramePointer) );
+ #endif
+ 
+-#ifdef __x86_64__
++#if defined(__x86_64__) && !defined(__ILP32__)
+ #define SIGRETURN_FRAME_OFFSET 23
+ 		__asm __volatile__ ( "movq %%rbp,%0":"=r"(pFramePointer):"r"(pFramePointer) );
+ #endif
