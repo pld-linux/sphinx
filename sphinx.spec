@@ -16,12 +16,12 @@
 Summary:	Free open-source SQL full-text search engine
 Summary(pl.UTF-8):	Silnik przeszukiwania pełnotekstowego SQL open-source
 Name:		sphinx
-Version:	2.2.8
-Release:	2
+Version:	2.2.9
+Release:	1
 License:	GPL v2
 Group:		Applications/Databases
 Source0:	http://www.sphinxsearch.com/files/%{name}-%{version}-release.tar.gz
-# Source0-md5:	4eb54ad6bd9a03b8b39bc10f16e59a63
+# Source0-md5:	1fcc3d180c0559bdeb93602ef248caf4
 Source1:	%{name}.init
 Source2:	%{name}.logrotate
 Source3:	%{name}.conf.sh
