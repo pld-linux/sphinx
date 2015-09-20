@@ -16,12 +16,12 @@
 Summary:	Free open-source SQL full-text search engine
 Summary(pl.UTF-8):	Silnik przeszukiwania pełnotekstowego SQL open-source
 Name:		sphinx
-Version:	2.2.9
+Version:	2.2.10
 Release:	1
-License:	GPL v2
+License:	GPL v2, LGPL (API libraries)
 Group:		Applications/Databases
 Source0:	http://www.sphinxsearch.com/files/%{name}-%{version}-release.tar.gz
-# Source0-md5:	1fcc3d180c0559bdeb93602ef248caf4
+# Source0-md5:	dda52b24d8348fc09e26d8a649a231d2
 Source1:	%{name}.init
 Source2:	%{name}.logrotate
 Source3:	%{name}.conf.sh
@@ -113,6 +113,7 @@ Statyczna biblioteka sphinxclient.
 %package -n java-sphinxapi
 Summary:	Java API for Sphinx
 Summary(pl.UTF-8):	API Javy dla Sphinksa
+License:	LGPL
 Group:		Development/Languages/Java
 Requires:	jpackage-utils
 Obsoletes:	java-sphinx < 2.0.3-5
@@ -129,6 +130,7 @@ API Javy dla Sphinksa.
 %package -n php-sphinxapi
 Summary:	PHP API for Sphinx Search
 Summary(pl.UTF-8):	API PHP dla Sphinksa
+License:	LGPL
 Group:		Libraries
 Requires:	php(core) >= %{php_min_version}
 Provides:	php(sphinx)
@@ -146,6 +148,7 @@ API PHP dla Sphinksa.
 %package -n python-sphinxapi
 Summary:	Python API for Sphinx Search
 Summary(pl.UTF-8):	API Python dla Sphinksa
+License:	LGPL
 Group:		Development/Languages/Python
 Requires:	python
 Obsoletes:	python-sphinx < 2.0.3-5
@@ -228,7 +231,7 @@ mv $RPM_BUILD_ROOT{%{_bindir},%{_sbindir}}/searchd
 install -p %{SOURCE1} $RPM_BUILD_ROOT/etc/rc.d/init.d/%{name}
 cp -p %{SOURCE2} $RPM_BUILD_ROOT/etc/logrotate.d/%{name}
 install -p %{SOURCE3} $RPM_BUILD_ROOT%{_sysconfdir}/%{name}.conf
-install %{SOURCE4} $RPM_BUILD_ROOT%{systemdtmpfilesdir}/%{name}.conf
+cp -p %{SOURCE4} $RPM_BUILD_ROOT%{systemdtmpfilesdir}/%{name}.conf
 
 install -d $RPM_BUILD_ROOT%{php_data_dir}
 cp -p api/sphinxapi.php $RPM_BUILD_ROOT%{php_data_dir}
