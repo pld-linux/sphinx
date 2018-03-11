@@ -17,7 +17,7 @@ Summary:	Free open-source SQL full-text search engine
 Summary(pl.UTF-8):	Silnik przeszukiwania pełnotekstowego SQL open-source
 Name:		sphinx
 Version:	2.2.11
-Release:	1
+Release:	2
 License:	GPL v2, LGPL (API libraries)
 Group:		Applications/Databases
 Source0:	http://www.sphinxsearch.com/files/%{name}-%{version}-release.tar.gz
@@ -165,10 +165,8 @@ API Pythona dla Sphinksa.
 %prep
 %setup -q -n %{name}-%{version}-release
 %patch0 -p1
-%patch1 -p1
+#patch1 -p1
 %patch2 -p1
-
-sed -i -e 's#AM_MAINTAINER_MODE#AM_MAINTAINER_MODE\nAM_PROG_AR#' configure.ac
 
 sed -i -e '
 	s#/var/run/#/var/run/sphinx/#
@@ -177,9 +175,11 @@ sed -i -e '
 	s#@CONFDIR@/data/#/var/lib/sphinx/#g
 ' sphinx*.conf.in
 
+sed -i -e '
+	s#libdirs="/usr/lib/x86_64-linux-gnu /usr/lib64 /usr/local/lib64 /usr/lib/i386-linux-gnu /usr/lib /usr/local/lib"#libdirs="/usr/libx32 /usr/lib64 /usr/lib"#
+' configure
+
 %build
-%{__aclocal}
-%{__autoconf}
 CPPFLAGS=-D_FILE_OFFSET_BITS=64
 %configure \
 	--with%{!?with_libstemmer:out}-libstemmer \
@@ -193,11 +193,6 @@ cp -pf sphinx-min.conf.dist sphinx-min.conf
 
 # libsphinxclient
 cd api/libsphinxclient
-%{__libtoolize}
-%{__aclocal}
-%{__autoconf}
-%{__autoheader}
-%{__automake}
 CPPFLAGS=-D_FILE_OFFSET_BITS=64
 %configure
 %{__make} -j1
