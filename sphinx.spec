@@ -11,8 +11,6 @@
 %bcond_without	pgsql		# without PostgreSQL support
 
 %define		php_min_version 5.0.4
-%include	/usr/lib/rpm/macros.php
-%{?with_java:%include	/usr/lib/rpm/macros.java}
 Summary:	Free open-source SQL full-text search engine
 Summary(pl.UTF-8):	Silnik przeszukiwania pełnotekstowego SQL open-source
 Name:		sphinx
