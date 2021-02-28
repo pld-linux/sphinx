@@ -115,9 +115,7 @@ License:	LGPL
 Group:		Development/Languages/Java
 Requires:	jpackage-utils
 Obsoletes:	java-sphinx < 2.0.3-5
-%if "%{_rpmversion}" >= "5"
 BuildArch:	noarch
-%endif
 
 %description -n java-sphinxapi
 Java API for Sphinx.
@@ -133,9 +131,7 @@ Group:		Libraries
 Requires:	php(core) >= %{php_min_version}
 Provides:	php(sphinx)
 Obsoletes:	php-sphinx < 2.0.3-5
-%if "%{_rpmversion}" >= "5"
 BuildArch:	noarch
-%endif
 
 %description -n php-sphinxapi
 PHP API for Sphinx Search.
@@ -150,9 +146,7 @@ License:	LGPL
 Group:		Development/Languages/Python
 Requires:	python
 Obsoletes:	python-sphinx < 2.0.3-5
-%if "%{_rpmversion}" >= "5"
 BuildArch:	noarch
-%endif
 
 %description -n python-sphinxapi
 Python API for Sphinx Search.
