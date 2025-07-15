@@ -156,9 +156,9 @@ API Pythona dla Sphinksa.
 
 %prep
 %setup -q -n %{name}-%{version}-release
-%patch0 -p1
+%patch -P0 -p1
 #patch1 -p1
-%patch2 -p1
+%patch -P2 -p1
 
 sed -i -e '
 	s#/var/run/#/var/run/sphinx/#
